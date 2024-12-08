@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarvestBazar - Product Detail</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <style>
+        .product-image-thumbs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .product-image-thumb {
+            border: 1px solid #ddd;
+            padding: 5px;
+            cursor: pointer;
+        }
+        
+        .product-image-thumb:hover {
+            border-color: #28a745;
+        }
+        
+        .price-tag {
+            font-size: 24px;
+            color: #28a745;
+        }
+        
+        .old-price {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+/*         
+        .related-product-card {
+            transition: transform 0.2s;
+        }
+        
+        .related-product-card:hover {
+            transform: translateY(-5px);
+        } */
+        .related-product-card {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.related-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.product-image-wrapper {
+    position: relative;
+    padding-top: 100%; /* Maintains a square aspect ratio */
+    width: 100%;
+}
+
+.related-product-image {
+    height: 150px; /* Adjust height as needed for uniformity */
+    width: 100%;
+    object-fit: cover;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+
+.card-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.price-tag {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #229834;
+}
+
+.mt-auto {
+    margin-top: auto;
+}
+
+        .navbar-brand {
+            color: #28a745 !important;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .zoom-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        #mainProductImage {
+            width: 100%;
+            height: auto;
+            cursor: crosshair; /* Change cursor to crosshair for better indication */
+        }
+
+        .zoom-window {
+            position: absolute;
+            border: 2px solid #000;
+            border-radius: 4px;
+            width: 200px; /* Width of the zoom window */
+            height: 200px; /* Height of the zoom window */
+            overflow: hidden;
+            display: none;
+            pointer-events: none; /* Prevent interaction with the zoom window */
+            z-index: 1000; /* Ensure it appears on top */
+        }
+        footer {
+            background-color: #1c1c1c;
+            color: white;
+            padding: 3rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-logo {
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #999;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .payment-methods img {
+            height: 10px;
+            margin-right: 0.5rem;
+        }
+       
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <div class="col-md-6">
+                <a href="/"><img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="50"></a>
+            </div>
+            <div class="d-flex align-items-center">
+                <a href="/wishlist" class="text-black me-3 position-relative">
+                    <i class="far fa-heart" style="font-size: 1.0rem;"></i>
+                    <span id="wishlist-badge" class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle">
+                        0
+                    </span>
+                </a> 
+                <a href="/shoppingCart" class="text-black me-3 position-relative">
+                    <i class="fas fa-shopping-cart" style="font-size: 1.0rem;"></i>
+                    <span id="cart-badge" class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle">
+                        0
+                    </span>
+                </a>    
+                <% if (user) { %>
+                    <!-- Show profile icon if user is logged in -->
+                    <a href="/userDashboard" class="text-black me-3"><i class="far fa-user" aria-hidden="true"></i></i></a>
+                <% } else { %>
+                    <!-- Show Login/Signup if no user is logged in -->
+                    <a href="/login" class="btn btn-outline-secondary">Login/signup</a>
+                    
+                <% } %>
+                
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="container mt-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb ">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-success">Home</a></li>
+                <li class="breadcrumb-item"><a href="" class="text-decoration-none text-success"><%= product.category.name %></a></li>
+                <li class="breadcrumb-item active"><%= product.name %></li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Product Detail -->
+    <div class="container my-5">
+        <div class="row">
+            <!-- Product Images -->
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-2">
+                        <div class="product-image-thumbs">
+                            <% product.images.forEach((image,index)=>{ %>
+                            <div class="product-image-thumb <%= index === 0 ? 'active' : '' %>" onclick="changeMainImage('<%= image %>')">
+                                <img src="<%= image %>" class="img-fluid" alt="<%= product.name %> Thumb" >
+                            </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                    <div class="col-10">
+                        <div class="zoom-container">
+                            <img id="mainProductImage" src="<%= product.images[0] %>" class="img-fluid" alt="<%= product.name %>">
+                        </div>
+                        <div id="zoomWindow" class="zoom-window" style="display: none;"></div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="col-md-6">
+                <h2><%= product.name %></h2>
+                <span class="badge <%= product.stock > 0 ? 'bg-success' : 'bg-danger' %>">
+                    <%= product.stock > 0 ? 'In Stock' : 'Out of Stock' %>
+                </span>
+                <div class="mb-3">
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <span class="ms-2">(5 Reviews)</span>
+                </div>
+                <div class="mb-3">
+                    <span class="price-tag" id="priceTag">₹ <%= product.priceAfterDiscount.toFixed(2) %></span>
+                    <span class="old-price ms-2">₹<%= product.price %>/kg</span>
+                </div>
+                <% if(product.stock < 10){ %>
+                    <p class="text-danger fw-bold"> <%= product.stock %>kg left </p>
+                <% } %>
+                
+                <div class="d-flex align-items-center mb-4">
+                    <div class="input-group" style="width: 130px;">
+                        <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(-1)">-</button>
+                        <input type="number" id="quantityInput" class="form-control text-center" value="1" min="1" max="<%= product.stock %>" onchange="updatePrice()">
+                        <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(1)">+</button>
+                    </div>
+                    
+                    <% if(product.stock === 0) { %>
+                        <button class="btn btn-success ms-3 px-4" disabled>
+                            Add to Cart
+                            <i class="fas fa-shopping-cart ms-2"></i>
+                        </button>
+                        <% } else { %>
+                        <button class="btn btn-success ms-3 px-4" id="addToCartBtn" onclick="addToCart('<%= product._id %>')">
+                            Add to Cart
+                            <i class="fas fa-shopping-cart ms-2"></i>
+                        </button>
+                        <% } %>
+                    <button class="btn btn-outline-secondary ms-2" onclick="addToWishlist('<%= product._id %>')">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+
+                <!-- Apply Coupon Section
+                <div class="d-flex align-items-center mb-4">
+                    <input type="text" class="form-control" placeholder="Enter Coupon Code" style="max-width: 300px;">
+                    <button class="btn btn-outline-success ms-2">Apply</button>
+                </div> -->
+                <!-- Product Features -->
+                <div class="row mt-4">
+                    <div class="col-6 col-md-3 text-center">
+                        <div class="feature-icon mx-auto">
+                            <i class="fas fa-percentage text-success"></i>
+                        </div>
+                        <h6><%=product.offerDiscount %>% Discount</h6>
+                        <small class="text-muted">Save up to ₹<%= product.discountAmount %> money/kg</small>
+                    </div>
+                    <div class="col-6 col-md-3 text-center">
+                        <div class="feature-icon mx-auto">
+                            <i class="fas fa-leaf text-success"></i>
+                        </div>
+                        <h6>100% PURE <%= product.category.name %></h6>
+                        <!-- <small class="text-muted">100% <%= product.category.name %></small> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Tabs -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="description-tab" data-bs-toggle="tab" href="#description" role="tab">Description</a>
+                    </li>
+                </ul>
+                <div class="tab-content p-4 border border-top-0" id="productTabsContent">
+                    <div class="tab-pane fade show active" id="description" role="tabpanel">
+                        <p><%= product.description %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Products -->
+        <div class="row mt-5">
+            <h3 class="mb-4">Related Products</h3>
+            <% relatedProducts.forEach(relatedProduct => { %>
+            <div class="col-6 col-md-3">
+                <div class="card related-product-card">
+                    <a href="/productDetails/<%= relatedProduct._id %>" style="text-decoration: none; color: black;">
+                        <img src="<%= relatedProduct.images[0] %>" class="card-img-top related-product-image" alt="<%= relatedProduct.name %>">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= relatedProduct.name %></h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="price-tag">₹<%= relatedProduct.priceAfterDiscount.toFixed(2) %>/kg</span>
+                                <span class="old-price ms-2">₹<%= product.price %>/kg</span>
+                                <% if(relatedProduct.stock === 0) { %>
+                                    <button class="btn btn-outline-primary btn-sm" disabled>
+                                       
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                    <% } else { %>
+                                    <button class="btn btn-outline-primary btn-sm" type="button" id="addToCartBtn" onclick="addToCart('<%= product._id %>')">
+                                        
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                    <% } %>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+        
+        
+    </div>
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <a href="#" class="footer-logo">
+                    <img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="50">
+                </a>
+                
+                <div class="mt-3">
+                    <span class="text-white">1800-4587-7845</span> or
+                    <a href="" class="text-white">harvestbazar@gmail.com</a>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h5>My Account</h5>
+                <ul class="footer-links">
+                    <li><a href="#">My Account</a></li>
+                    <li><a href="#">Order History</a></li>
+                    <li><a href="#">Shopping Cart</a></li>
+                    <li><a href="#">Wishlist</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h5>Helps</h5>
+                <ul class="footer-links">
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Terms & Condition</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h5>Proxy</h5>
+                <ul class="footer-links">
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Shop</a></li>
+                    <li><a href="#">Product</a></li>
+                    <li><a href="#">Track Order</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr class="mt-4 mb-4 border-secondary">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <small class="text-white">Ecocrate eCommerce © 2024. All Rights Reserved</small>
+            </div>
+            <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                <img src="/api/placeholder/32/20" alt="Apple Pay" class="payment-methods">
+                <img src="/api/placeholder/32/20" alt="Visa" class="payment-methods">
+                <img src="/api/placeholder/32/20" alt="Discover" class="payment-methods">
+                <img src="/api/placeholder/32/20" alt="Mastercard" class="payment-methods">
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        
+
+        function changeMainImage(imageUrl) {
+        const mainImage = document.getElementById('mainProductImage');
+        mainImage.src = imageUrl; 
+
+        
+        const thumbs = document.querySelectorAll('.product-image-thumb');
+        
+       
+        thumbs.forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        
+        const clickedThumb = Array.from(thumbs).find(thumb => thumb.querySelector('img').src === imageUrl);
+        if (clickedThumb) {
+            clickedThumb.classList.add('active');
+        }
+    }
+
+
+    // For image zooming
+    const zoomWindow = document.getElementById('zoomWindow');
+    const mainImage = document.getElementById('mainProductImage');
+    let zoomActive = false;
+
+    function showZoom(event) {
+        zoomActive = true;
+        const zoomFactor = 2;
+        const imgRect = mainImage.getBoundingClientRect();
+
+        const offsetX = event.clientX - imgRect.left;
+        const offsetY = event.clientY - imgRect.top;
+
+        
+        if (offsetX < 0 || offsetY < 0 || offsetX > imgRect.width || offsetY > imgRect.height) {
+            hideZoom(); 
+            return;
+        }
+        
+        zoomWindow.style.left = `${event.pageX + 15}px`;
+        zoomWindow.style.top = `${event.pageY + 15}px`;
+
+        zoomWindow.style.backgroundImage = `url(${mainImage.src})`;
+        zoomWindow.style.backgroundSize = `${imgRect.width * zoomFactor}px ${imgRect.height * zoomFactor}px`;
+        zoomWindow.style.backgroundPosition = `-${offsetX * zoomFactor}px -${offsetY * zoomFactor}px`;
+        zoomWindow.style.display = 'block';
+    }
+
+    function hideZoom() {
+        
+        zoomActive = false;
+        zoomWindow.style.display = 'none';
+    }
+
+   
+    mainImage.addEventListener('mousemove', (event) => {
+        if (!zoomActive) {
+            showZoom(event);
+        } else {
+            
+            showZoom(event);
+        }
+    });
+
+    mainImage.addEventListener('mouseleave', hideZoom);
+
+
+    //quantity
+    let productPrice = <%= product.priceAfterDiscount %>;
+    
+    function updateQuantity(change) {
+        const quantityInput = document.getElementById('quantityInput');
+        let currentQuantity = parseInt(quantityInput.value);
+
+        
+        currentQuantity += change;
+        
+        if (currentQuantity >= 1 && currentQuantity <= <%= product.stock %> && currentQuantity <= 10 ) {
+            quantityInput.value = currentQuantity;
+            updatePrice();  
+        }
+    }
+
+// Update price based on the quantity
+function updatePrice() {
+    const quantity = parseInt(document.getElementById('quantityInput').value);
+    const totalPrice = quantity * productPrice;
+    document.getElementById('priceTag').textContent = `₹${totalPrice.toFixed(2)}/kg`;
+}
+
+// Add to Cart functionality
+async function addToCart(productId) {
+    const quantity = document.getElementById('quantityInput').value;
+
+    if (quantity < 1 || quantity > <%= product.stock %>) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Quantity',
+            text: 'Please select a valid quantity.',
+        });
+        return;
+    }
+
+    
+    try {
+        const response = await fetch('/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                productId: productId,
+                quantity: quantity,
+            }),
+        });
+
+        const data = await response.json(); 
+        console.log('Response data:', data); 
+
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Added to Cart!',
+                text: 'The product has been added to your cart.',
+            }).then(()=>{
+                location.reload()
+            })
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'Login to add to cart.',
+            });
+        }
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Log in. Please try again later.',
+        });
+    }
+}
+
+    
+    // Add to Wishlist
+    async function addToWishlist(productId) {
+        try {
+            const response = await fetch('/wishlist/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productId })
+            });
+
+            const data = await response.json();
+
+            if (data.message) {
+                let icon = 'success'; 
+                if (data.type === 'warning') {
+                    icon = 'warning'; 
+                }
+                Swal.fire({
+                    icon: icon,
+                    title: icon === 'warning' ? 'Warning' : 'Success',
+                    text: data.message,
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(()=>{
+                    location.reload()
+                })
+            } else if (data.error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.error
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Log in to add to wishlist.'
+                });
+            console.error('Error adding to wishlist:', error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+        fetch('/cart/count')
+            .then(response => response.json())
+            .then(data =>{
+                const cartBadge = document.getElementById('cart-badge')
+                if(data.cartCount > 0){
+                    cartBadge.textContent = data.cartCount
+                    cartBadge.style.display = 'inline'
+                } else {
+                    cartBadge.style.display = 'none'
+                }
+            })
+            .catch(error =>{
+                console.error('Error fetching cart count:',error)
+            })
+
+        fetch('/wishlist/count')
+            .then(response => response.json())
+            .then(data =>{
+                const wishlistBadge = document.getElementById('wishlist-badge')
+                if(data.wishlistCount > 0){
+                    wishlistBadge.textContent = data.wishlistCount
+                    wishlistBadge.style.display = 'inline'
+                } else {
+                    wishlistBadge.style.display = 'none'
+                }
+            }).catch(error =>{
+                console.error('Error fetching wishlist count:',error)
+            })
+
+        const productId = window.location.pathname.split('/')[2]
+        fetch(`/productDetails/${productId}`)
+            .then(response =>{
+                if(!response.ok){
+                    return response.json().then(data =>{
+                        Swal.fire({
+                            icon:'error',
+                            title:'Oops...',
+                            text:data.message || 'An unexpected error occured!',
+                            confirmButtonText: 'OK' 
+                        })
+                    })
+                }
+               
+            }).catch(err =>{
+                console.error('Fetch :',err)
+                Swal.fire({
+                    icon:'error',
+                    title:'Network error',
+                    text:'Check your connection and try again',
+                    confirmButtonText:'OK'
+                })
+            })
+
+    })
+    </script>
+</body>
+</html>

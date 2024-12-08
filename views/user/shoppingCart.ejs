@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - HarvestBazar</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <style>
+        :root {
+            --primary-color: #00B517;
+        }
+
+        /* General Styles */
+        body {
+            background-color: #f2f2f2;
+        }
+        
+        /* Header and Navbar */
+        .navbar-brand img {
+            height: 40px;
+        }
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-banner {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/api/placeholder/1920/300');
+            background-size: cover;
+            background-position: center;
+            padding: 60px 0;
+            color: white;
+            text-align: center;
+        }
+
+        /* Cart Styles */
+        .cart-item {
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s ease;
+        }
+        .cart-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cart-summary {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        .checkout-btn {
+            background: var(--primary-color);
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .checkout-btn:hover {
+            background: #009614;
+        }
+
+        /* Quantity Controls */
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .quantity-btn {
+            width: 32px;
+            height: 32px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .quantity-btn:hover {
+            background: #e9ecef;
+        }
+        .quantity-input {
+            width: 40px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* Remove Button */
+        .remove-item {
+            color: #dc3545;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .remove-item:hover {
+            color: #b92d2b;
+        }
+
+        /* Footer Buttons */
+        .footer-btn {
+            background-color: var(--primary-color);
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .footer-btn:hover {
+            background-color: #009614;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="navbar navbar-expand-lg navbar-light border-bottom">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="/images/HarvestBazar1.png" alt="HarvestBazar">
+            </a>
+            
+            <div class="d-flex align-items-center gap-3">
+                <a href="/wishlist" class="text-black me-3 position-relative">
+                    <i class="far fa-heart" style="font-size: 1.0rem;"></i>
+                    <span id="wishlist-badge" class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle">
+                        0
+                    </span>
+                </a>
+                <a href="/userDashboard" class="text-black me-3"><i class="far fa-user"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Banner -->
+    <div class="page-banner mb-4">
+        <div class="container">
+            <h1 class="display-5">My Shopping Cart</h1>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Content -->
+    <div class="container mb-5">
+        <div class="row">
+            <!-- Cart Items -->
+            <div class="col-lg-8 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Cart Item Example -->
+                         <% if (cart && cart.items.length > 0){ %>
+                            <% cart.items.forEach(item => { %>
+                        <div class="cart-item d-flex justify-content-between align-items-center">
+                            <a style="text-decoration: none; color: black;" href="/productDetails/<%= item.product._id %>">
+                            <div class="d-flex align-items-center gap-3">
+                                <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>" class="product-image" style="width: 100px; height: 100px;">
+                                <div>
+                                    <h6><%= item.product.name %></h6>
+                                    <span class="badge <%= item.product.stock > 0 ? 'bg-success' : 'bg-danger' %>">
+                                        <%= item.product.stock > 0 ? 'In Stock' : 'Out of Stock' %>
+                                    </span>
+                                </div>
+                            </div>
+                            </a>
+                            <div>₹<%= item.product.priceAfterDiscount.toFixed(2) %>/kg</div>
+                            <div><del class="text-muted">₹<%= item.product.price %>/kg</del></div>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('<%= item.product._id %>', -1)">-</button>
+                                <input type="text" value="<%= item.quantity %>" class="quantity-input text-center" readonly>
+                                <button class="quantity-btn" onclick="updateQuantity('<%= item.product._id %>', 1)">+</button>
+                            </div>
+                            <div>₹<%= (item.product.priceAfterDiscount * item.quantity).toFixed(2) %></div>
+                            <i class="fas fa-times remove-item" onclick="removeFromCart('<%= item.product._id %>')"></i>
+                        </div>
+                        <% }) %>
+                        <% } else { %>
+                            <p class="text-center text-muted">Your cart is empty.</p>
+                        <% } %>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between p-3">
+                        <a href="/" class="btn btn-outline-secondary">Return to Shop</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cart Summary -->
+            <div class="col-lg-4">
+                <div class="cart-summary card p-3">
+                    <h5>Cart Total</h5>
+                    <div class="summary-row d-flex justify-content-between">
+                        <span>Subtotal:</span>
+                        <% if (cart && cart.totalPrice && cart.totalPrice > 0) { %>
+                            <span>₹<%= cart.totalPrice.toFixed(2) %></span>
+                        <% } else { %>
+                            <span>₹0.00</span>
+                        <% } %>
+                    </div>
+                    <div class="summary-row d-flex justify-content-between">
+                        <span>Delivery Charge:</span>
+                        <% if(cart){ %>
+                            <span class="text-success">₹<%= shipping.toFixed(2) %></span>
+                        <% } else {%>
+                            <span class="text-success">₹0.00</span>
+                        <% } %>
+                    </div>
+                    <div class="summary-row border-top pt-2 d-flex justify-content-between">
+                        <strong>Total:</strong>
+                        <% if(cart){ %>
+                            <strong id="cart-total"><%= totalAmount.toFixed(2) %></strong>
+                        <% } else { %>
+                            <strong id="cart-total">₹0.00</strong>
+                        <% } %>
+                    </div>
+                    <button class="btn btn-success btn-block mt-3" onclick="proceedToCheckout()">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Update Quantity Function
+        async function updateQuantity(productId, change) {
+
+            try {
+                const response = await fetch(`/update/${productId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ change })
+                });
+                const result = await response.json();
+                console.log("server response",result);
+                
+                if (result.success) {
+                    
+                    location.reload();
+                    const itemRow = document.getElementById(`cart-item-${productId}`);
+                    if (itemRow) {
+                        itemRow.querySelector('.item-quantity').textContent = result.updatedQuantity;
+                        itemRow.querySelector('.item-price').textContent = `₹${result.updatedPrice}`;
+
+                        
+                        const totalPriceElement = document.getElementById('cart-total');
+                        if (totalPriceElement) {
+                            totalPriceElement.textContent = `₹${result.totalPrice}`;
+                        }
+
+                    }                   
+                    Swal.fire('Success', 'Cart updated successfully', 'success');
+                } else {
+                    Swal.fire('Error', result.message, 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Failed to update quantity. Try again.', 'error');
+            }
+        }
+
+// Remove Item from Cart
+async function removeFromCart(productId) {
+    
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to remove this item from your cart?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, remove it!'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/remove`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId }) 
+                });
+                const result = await response.json();
+                console.log("Backend response:", result); 
+
+                if (result.success) { 
+                    location.reload();
+                    Swal.fire('Success', 'Item removed successfully', 'success');
+                } else {
+                    Swal.fire('Error', result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire('Error', 'Something went wrong. Please try again later.', 'error');
+            }
+        }
+    });
+}
+
+//check out validation
+async function proceedToCheckout() {
+    const cartItems = document.querySelectorAll('.cart-item');
+    const cartTotalElements = document.querySelectorAll('#cart-total')
+    let insufficientStockItems = [];
+    let blockedItems = [];
+
+    // Check if the cart is empty
+    if (cartItems.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Your cart is empty',
+            text: 'Please add items to your cart before proceeding to checkout.',
+            confirmButtonText: 'Go Shopping',
+        });
+        return;
+    }
+
+    let cartTotal = 0;
+    cartTotalElements.forEach(element => {
+        const amount = parseFloat(element.innerText.replace(/[^0-9.-]+/g, ""));
+        if (!isNaN(amount)) {
+            cartTotal += amount;
+        }
+    });
+
+    if (cartTotal === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Amount Warning',
+            text: 'Amount zero not allowed',
+            confirmButtonText: 'Continue shopping',
+        });
+        return;
+    }
+
+    // Validate stock and block status for all cart items
+    for (const item of cartItems) {
+        const productId = item.querySelector('.remove-item').getAttribute('onclick').match(/'(.*?)'/)[1];
+        const cartQuantity = parseInt(item.querySelector('.quantity-input').value.trim(), 10);
+
+        // Fetch the current stock and block status from the server
+        const response = await fetch(`/product-stock/${productId}`);
+        const data = await response.json();
+        const { stock, isDeleted, name } = data.product;
+
+        // Handle blocked products
+        if (isDeleted) {
+            blockedItems.push(name);
+            continue;
+        }
+
+        // Check if cart quantity exceeds available stock
+        if (cartQuantity > stock) {
+            insufficientStockItems.push({
+                productName: name,
+                availableStock: stock,
+                cartQuantity,
+            });
+        }
+    }
+
+    // Display blocked products
+    if (blockedItems.length > 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Blocked Products',
+            html: `
+                <p>The following products are blocked by the admin:</p>
+                <ul style="text-align: left;">
+                    ${blockedItems.map(name => `<li>${name}</li>`).join('')}
+                </ul>
+            `,
+            confirmButtonText: 'Update Cart',
+        });
+        return;
+    }
+
+    // Display insufficient stock items
+    if (insufficientStockItems.length > 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Insufficient Stock',
+            html: `
+                <p>Some items in your cart exceed the available stock:</p>
+                <ul style="text-align: left;">
+                    ${insufficientStockItems.map(item => `
+                        <li>
+                            ${item.productName} (Available: ${item.availableStock}, Cart: ${item.cartQuantity})
+                        </li>
+                    `).join('')}
+                </ul>
+            `,
+            confirmButtonText: 'Update Cart',
+        });
+        return;
+    }
+
+    // If all validations pass, proceed to checkout
+    window.location.href = '/checkout';
+}
+
+//wishlist count
+document.addEventListener('DOMContentLoaded',()=>{
+    
+    fetch('/wishlist/count')
+            .then(response => response.json())
+            .then(data =>{
+                const wishlistBadge = document.getElementById('wishlist-badge')
+                if(data.wishlistCount > 0){
+                    wishlistBadge.textContent = data.wishlistCount
+                    wishlistBadge.style.display = 'inline'
+                } else {
+                    wishlistBadge.style.display = 'none'
+                }
+            }).catch(error =>{
+                console.error('Error fetching wishlist count:',error)
+            })
+
+    fetch('/shoppingCart')
+            .then(response =>{
+                if(!response.ok){
+                    return response.json().then(data =>{
+                        Swal.fire({
+                            icon:'error',
+                            title:'Oops...',
+                            text: data.message,
+                            confirmButtonText:'OK'
+                        })
+                    })
+                }
+            }).catch(err =>{
+                console.error(error)
+                Swal.fire({
+                    icon:'error',
+                    title:'Internal server error',
+                    text:'Something went wrong while fetching cart',
+                    confirmButtonText:'OK'
+                })
+            })
+})
+    </script>
+</body>
+</html>

@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarvestBazar - Products</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Sidebar Styles */
+        /* .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 250px;
+            background-color: #f8f9fa;
+            padding-top: 60px;
+            transition: 0.3s;
+            z-index: 1000;
+        } */
+        
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: 0.3s;
+        }
+        
+        .content.expanded {
+            margin-left: 70px;
+        }
+        .content.active {
+        margin-left: 250px; /* Adjust to fit sidebar width */
+        }
+
+        
+        /* .nav-link {
+            color: #333;
+            padding: 10px 15px;
+        }
+        
+        .nav-link:hover {
+            background-color: #e9ecef;
+        }
+        
+        .nav-link.active {
+            background-color: #007bff;
+            color: white;
+        } */
+        
+        /* Header Styles */
+        /* .navbar {
+            position: fixed;
+            width: 100%;
+            z-index: 1001;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        } */
+        
+        /* Product Card Styles */
+        .product-card {
+            transition: transform 0.2s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Responsive Design */
+        /* @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .content {
+                margin-left: 0;
+            }
+            
+            .content.expanded {
+                margin-left: 0;
+            }
+        }
+        
+        .logo-container {
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1002;
+            background-color: white;
+            width: 250px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .toggle-btn {
+            position: fixed;
+            top: 10px;
+            left: 260px;
+            z-index: 1002;
+        }
+        
+        .mobile-toggle {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .toggle-btn {
+                display: none;
+            }
+            
+            .mobile-toggle {
+                display: block;
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 1002;
+            }
+        } */
+        .logo-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            padding: 15px;
+            background: white;
+            z-index: 1030;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: -250px;
+            width: 250px;
+            height: calc(100vh - 60px);
+            background: #fff;
+            transition: 0.3s;
+            z-index: 1020;
+            overflow-y: auto;
+            border-right: 1px solid #eee;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .nav-link {
+            color: #666;
+            padding: 10px 20px;
+        }
+
+        .nav-link:hover {
+            background-color: #f8f9fa;
+        }
+
+        .nav-link.active {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .main-content {
+            margin-left: 0;
+            transition: 0.3s;
+            padding-top: 60px;
+        }
+
+        .main-content.active {
+            margin-left: 250px;
+        }
+
+        .toggle-btn {
+            position: fixed;
+            top: 15px;
+            left: 260px;
+            z-index: 1040;
+            transition: 0.3s;
+            display: none;
+        }
+
+        .toggle-btn.active {
+            left: 260px;
+        }
+
+        .mobile-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1040;
+            display: none;
+        }
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-card-image {
+            height: 150px; 
+            object-fit: cover; 
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .card-body {
+            flex-grow: 1; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title, .card-text {
+            margin: 0; 
+        }
+        .original-price {
+            font-size: 0.875rem;
+            color: #6c757d;
+            text-decoration: line-through;
+        }
+
+        .btn-group {
+            margin-top: auto; 
+        }
+      
+        @media (min-width: 992px) {
+            .sidebar {
+                left: 0;
+            }
+            .main-content {
+                margin-left: 250px;
+            }
+            .toggle-btn {
+                display: none;
+            }
+            .mobile-toggle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 991px) {
+            .logo-container {
+                left: -250px;
+            }
+            .logo-container.active {
+                left: 0;
+            }
+            .content {
+                margin-left: 0;
+            }
+            
+            .content.expanded {
+                margin-left: 0;
+            }
+            .mobile-toggle {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+            .sidebar {
+                left: -250px; /* Hide sidebar by default */
+            }
+
+            .sidebar.active {
+                left: 0; /* Show sidebar on toggle */
+            }
+
+            .content.active {
+                margin-left: 0; /* Full width for small screens */
+            }
+            .sale-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ff4444;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            z-index: 1;
+            font-size: 0.875rem;
+        }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="logo-container">
+        <a class="navbar-brand " href="#"><img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="50" > </a>
+    </div>
+
+    <!-- Mobile Toggle Button -->
+    <button class="btn btn-light mobile-toggle" id="mobileToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Desktop Toggle Button -->
+    <button class="btn btn-light toggle-btn" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar mt-3" id="sidebar">
+        <nav class="nav flex-column">
+            <a class="nav-link" href="/admin/dashboard"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+            <a class="nav-link" href="/admin/orders"><i class="fas fa-shopping-cart me-2"></i> Orders</a>
+            <a class="nav-link" href="/admin/productcategories"><i class="fas fa-list me-2"></i> Product Categories</a>
+            <a class="nav-link active" href=""><i class='fas fa-bookmark me-2'></i> Products</a>
+            <a class="nav-link" href="/admin/usermanagement"><i class="fas fa-users me-2"></i> User Management</a>
+            <!-- <a class="nav-link" href="#"><i class="fas fa-chart-bar me-2"></i> Sales Report</a> -->
+            <a class="nav-link" href="/admin/coupons"><i class="fas fa-ticket-alt me-2"></i> Coupons</a>
+            <a class="nav-link" href="/admin/offers"><i class="fa fa-gift me-2"></i> Offers</a>
+            <a class="nav-link" href="/admin/logout"><i class="fas fa-sign-out-alt me-2"></i> Log-out</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Products</h2>
+                <a href="/admin/products/addproduct" class="button-class btn btn-success">+Add Product</a>
+
+            </div>
+
+            <!-- Filters and Search -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <form action="/admin/products/search" method="get">
+                            <input type="text" name="query" class="form-control" placeholder="Search products...">
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+
+            <!-- Products Grid -->
+            <div class="row g-4">
+                <!-- Product Card -->
+             
+
+                <% products.forEach(product => { %>
+                    
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                        <div class="card product-card h-100">
+                            <% if(product.offerDiscount > 0){ %>
+                            <span class="badge bg-danger sale-badge">Sale <%= product.offerDiscount %>%</span>
+                            <% } %>
+                            <% if (product.images && product.images.length > 0) { %>
+                                <img src="<%= product.images[0] %>" class="card-img-top product-card-image" alt="<%= product.name %>">
+                            <% } else { %>
+                                <img src="/path/to/placeholder.jpg" class="card-img-top product-card-image" alt="No image available">
+                            <% } %>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title"><%= product.name %></h5>
+                                <p class="card-text text-muted"><%= product.category ? product.category.name : 'Uncategorised' %></p>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+
+                                    <span class="h5 mb-0">₹<%= product.priceAfterDiscount.toFixed(2) %></span>
+                                    <span class="original-price ms-2">₹<%= product.price %>/kg</span>
+                                    <span class="h5 mb-0"><%= product.isDeleted ? 'Unlisted' : 'Listed' %></span>
+                                    <span class="badge <%= product.stock > 0 ? 'bg-success' : 'bg-danger' %>">
+                                        <%= product.stock > 0 ? 'In Stock' : 'Out of Stock' %>
+                                    </span>
+                                </div>
+                                <div class="btn-group w-100 mt-auto"> 
+                                    <a href="/admin/products/<%= product._id %>/edit" class="btn btn-outline-primary"><i class="fas fa-edit"></i></a>
+                                    <form action="/admin/products/<%= product._id %>/toggle-delete" method="POST" style="display:inline;" id="softDeleteToggle-<%= product._id %>" data-id="<%= product._id %>">
+                                        <button type="button" class="btn <%= product.isDeleted ? 'btn-outline-success' : 'btn-outline-danger' %> btn-sm toggle-delete-btn">
+                                            <%= product.isDeleted ? 'List' : 'Unlist' %>
+                                        </button>
+                                    </form>
+                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="openOfferModal('<%= product._id %>')">
+                                        Apply Offer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+
+            
+
+            <!-- Pagination -->
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="/admin/products?page=<%= currentPage -1 %>" tabindex="-1">«</a>
+                    </li>
+                    <% for(let i=1; i<= totalPages; i++){ %>
+                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                        <a class="page-link" href="/admin/products?page=<%= i %>"><%= i %></a>
+                    </li>
+                    <% } %>
+                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="/admin/products?page=<%= currentPage + 1 %>">»</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+
+
+
+<!-- Offer Modal (Hidden by Default) -->
+<div class="modal fade" id="offerModal" tabindex="-1" aria-labelledby="offerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="offerModalLabel">Apply Offer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="applyOfferForm">
+                    <input type="hidden" id="productIdInput">
+                    <div class="mb-3">
+                        <label for="offerSelect" class="form-label">Select Offer</label>
+                        <select class="form-select" id="offerSelect" >
+                            <option value="">None</option>
+                            <% offers.forEach(offer => { %>
+                                <option value="<%= offer._id %>"><%= offer.title %> - <%= offer.discount %>% Off</option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Apply Offer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script>
+        // Toggle Sidebar
+        const sidebar = document.getElementById('sidebar');
+        const content = document.querySelector('.content'); // updated selector
+        const logo = document.querySelector('.logo-container');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const mobileToggle = document.getElementById('mobileToggle');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            content.classList.toggle('active'); 
+            logo.classList.toggle('active');
+            toggleBtn.classList.toggle('active');
+        }
+
+        toggleBtn.addEventListener('click', toggleSidebar);
+        mobileToggle.addEventListener('click', toggleSidebar);
+
+
+
+         // Function to open the modal and set the product ID
+    function openOfferModal(productId) {
+        document.getElementById('productIdInput').value = productId;
+        const modal = new bootstrap.Modal(document.getElementById('offerModal'));
+        modal.show();
+    }
+
+    // Handle the form submission for applying the offer
+    document.getElementById('applyOfferForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const productId = document.getElementById('productIdInput').value;
+        const offerId = document.getElementById('offerSelect').value;
+
+        fetch('/admin/applyOfferToProducts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId, offerId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Offer updated!',
+                    text: data.message,
+                    confirmButtonText: 'OK'
+                }).then(() => location.reload());
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error in applying',
+                    text: data.message,
+                    confirmButtonText: 'OK'
+                }).then(()=> location.reload())
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Unexpected Error',
+                text: 'An unexpected error occurred. Please try again later.',
+                confirmButtonText: 'OK'
+            });
+        });
+    });
+
+document.addEventListener("DOMContentLoaded",()=>{
+    const toggleDeleteButtons = document.querySelectorAll(".toggle-delete-btn")
+     toggleDeleteButtons.forEach(button =>{
+        button.addEventListener('click',async(e)=>{
+            const form = e.target.closest('form')
+            const productId = form.dataset.id;
+            const url = form.action;
+
+            try {
+                const response = await fetch(url, {
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json',
+                    },
+                    body: JSON.stringify({ productId })
+                })
+
+                if(!response.ok){
+                    Swal.fire({
+                        icon:'error',
+                        title:'Error',
+                        text:response.message || 'failed to toggle product status',
+                        confirmButtonText:'OK'
+                    })
+                }
+                const result = await response.json()
+                if(result.success){
+                    button.textContent = result.isDeleted ? 'list' : 'Unlist';
+                    button.className = result.isDeleted 
+                            ? "btn btn-outline-success btn-sm toggle-delete-btn" 
+                            : "btn btn-outline-danger btn-sm toggle-delete-btn";
+                    location.reload()
+                } else {
+                    Swal.fire({
+                        icon:'error',
+                        title:'Error',
+                        text:'failed to update the product status',
+                        confirmButtonText:'OK'
+                    })
+                }
+            } catch (error) {
+                console.error(error)
+                Swal.fire({
+                    icon:'error',
+                    title:'Error',
+                    text:'An error occured',
+                    confirmButtonText:'OK'
+                })
+            }
+        })
+     })
+})
+    
+    </script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Product</title>
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        .cropper-container { max-width: 800px; margin: 0 auto; }
+        .cropped-images-preview, .current-images-preview {
+            display: flex; flex-wrap: wrap; justify-content: center; margin-top: 1rem;
+        }
+        .cropped-images-preview img, .current-images-preview img {
+            width: 100px; height: 100px; object-fit: cover; margin: 0.5rem; position: relative;
+        }
+        .remove-btn { position: absolute; top: 5px; right: 5px; background-color: red; color: white; border: none; border-radius: 50%; }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <h2 class="mb-4">Edit Product</h2>
+        
+        <form id="editProductForm" action="/admin/products/<%= product._id %>/edit" method="post" enctype="multipart/form-data">
+            <!-- Basic Input Fields -->
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" value="<%= product.name %>" required>
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Price:</label>
+                <input type="number" class="form-control" id="price" name="price" value="<%= product.price %>" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label>
+                <textarea class="form-control" id="description" name="description" rows="3"><%= product.description %></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="category" class="form-label">Category:</label>
+                <select class="form-select" id="category" name="category" required>
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category._id %>" <%= product.category.toString() === category._id.toString() ? 'selected' : '' %>><%= category.name %></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="stock" class="form-label">Stock:</label>
+                <input type="number" class="form-control" id="stock" name="stock" value="<%= product.stock %>" required>
+            </div>
+            
+            <!-- Display Current Images with Remove Option -->
+            <div class="mb-3">
+                <label>Current Images:</label>
+                <div class="current-images-preview">
+                    <% product.images.forEach((image) => { %>
+                        <div style="position: relative;" class="image-container">
+                            <img src="<%= image %>" alt="Current Image" class="img-thumbnail">
+                            <button type="button" class="remove-btn" onclick="removeImage('<%= image %>')">&times;</button>
+                            <input type="hidden" name="currentImages[]" value="<%= image %>">
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+
+            <!-- New Image Upload & Cropping -->
+            <div class="mb-3">
+                <label for="imageUpload" class="form-label">Upload New Images (Optional):</label>
+                <input type="file" class="form-control" id="imageUpload" name="images" accept="image/*" multiple>
+            </div>
+
+            <!-- Cropper Container -->
+            <div class="cropper-container mb-3">
+                <img id="croppingImage" style="display: none;" alt="Image to crop">
+                <button type="button" class="btn btn-primary" id="cropButton" style="display: none;">Crop Image</button>
+            </div>
+
+            <!-- Cropped Images Preview -->
+            <div class="cropped-images-preview" id="croppedImagesPreview"></div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script>
+
+        //validation
+        document.getElementById('editProductForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    // Validation
+    const name = document.getElementById('name').value.trim();
+    const price = document.getElementById('price').value;
+    const description = document.getElementById('description').value.trim();
+    const stock = document.getElementById('stock').value;
+    const images = document.querySelectorAll('.current-images-preview img');
+
+    // Function to show SweetAlert
+    const showAlert = (title, text) => {
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: 'warning',
+            confirmButtonText: 'OK'
+        });
+    };
+
+    // Validate name
+    if (!name) {
+        showAlert('Validation Error', 'Please enter the product name.');
+        return;
+    }
+
+    // Validate price
+    if (!price || price <= 10) {
+        showAlert('Validation Error', 'Please enter a valid price greater than 10.');
+        return;
+    }
+
+    // Validate description
+    if (description.length < 10) {
+        showAlert('Validation Error', 'Description must be at least 10 characters long.');
+        return;
+    }
+
+    // Validate stock
+    if (!stock || stock < 0) {
+        showAlert('Validation Error', 'Please enter a valid stock quantity (0 or more).');
+        return;
+    }
+
+    // Validate images (current images or uploaded)
+    if (images.length === 0 && formData.getAll('croppedImages[]').length === 0) {
+        showAlert('Validation Error', 'At least one image is required.');
+        return;
+    }
+
+    // Append cropped images to FormData
+    const croppedImages = formData.getAll('croppedImages[]');
+    croppedImages.forEach(image => {
+        formData.append('croppedImages[]', image);
+    });
+
+    // Send AJAX request
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire({
+                title: 'Success',
+                text: 'Product updated successfully!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+              window.location.href = '/admin/products'
+            });
+        } else {
+            showAlert('Error', 'Failed to update product.');
+        }
+    } catch (error) {
+        console.error('Error updating product:', error);
+        showAlert('Error', 'Something went wrong, please try again.');
+    }
+});
+
+        //croping
+        let cropper;
+        const imageUpload = document.getElementById('imageUpload');
+        const croppingImage = document.getElementById('croppingImage');
+        const cropButton = document.getElementById('cropButton');
+        const croppedImagesPreview = document.getElementById('croppedImagesPreview');
+
+        let filesQueue = [];
+
+        // Handle image upload
+        imageUpload.addEventListener('change', (event) => {
+            filesQueue = Array.from(event.target.files);
+            loadNextImage();
+        });
+
+        // Load the next image for cropping
+        function loadNextImage() {
+            if (filesQueue.length === 0) {
+                croppingImage.style.display = 'none';
+                cropButton.style.display = 'none';
+                return;
+            }
+
+            const file = filesQueue.shift();
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                croppingImage.src = e.target.result;
+                croppingImage.style.display = 'block';
+                cropButton.style.display = 'inline-block';
+
+                if (cropper) cropper.destroy();
+                cropper = new Cropper(croppingImage, { aspectRatio: 1, viewMode: 1 });
+            };
+            reader.readAsDataURL(file);
+        }
+
+       
+        cropButton.addEventListener('click', () => {
+            if (cropper) {
+                cropper.getCroppedCanvas({ width: 500, height: 500 }).toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const imgElement = document.createElement('img');
+                    imgElement.src = url;
+                    croppedImagesPreview.appendChild(imgElement);
+
+                 
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'croppedImages[]';
+                    input.value = url; 
+                    croppedImagesPreview.appendChild(input);
+
+                    loadNextImage();
+                });
+            }
+        });
+
+
+function removeImage(imageUrl) {
+    const imageElements = document.querySelectorAll('.current-images-preview img');
+    const hiddenInputs = document.querySelectorAll('input[name="currentImages[]"]');
+
+    // Find the correct image and hidden input element
+    imageElements.forEach((img, index) => {
+        if (img.src === imageUrl) {
+            img.parentElement.remove();
+            
+            hiddenInputs[index].remove();
+        }
+    });
+
+    // Now, make an AJAX request to remove the image from the database and the file system
+    fetch('/admin/products/remove-image', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ imageUrl: imageUrl, productId: '<%= product._id %>' })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload()
+            console.log('Image successfully removed from database and server');
+        } else {
+            console.error('Error removing image from database');
+        }
+    })
+    .catch(error => {
+        console.error('Error removing image from database:', error);
+    });
+}
+
+
+  
+
+//sweet alert
+const urlParams = new URLSearchParams(window.location.search)
+const successMessage = urlParams.get('success')
+const errorMessage = urlParams.get('error')
+
+if(successMessage){
+    
+    Swal.fire({
+        icon:'success',
+        title:'success',
+        text:successMessage
+    }).then(() => {
+            // Clear query parameters after showing the alert
+            window.history.replaceState(null, null, window.location.pathname);
+        });
+}
+
+if(errorMessage){
+    swal.fire({
+        icon:'error',
+        title:'error',
+        text:errorMessage
+    }).then(() => {
+            // Clear query parameters after showing the alert
+            window.history.replaceState(null, null, window.location.pathname);
+        });
+}
+    </script>
+</body>
+</html>

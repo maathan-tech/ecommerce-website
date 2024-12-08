@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - HarvestBazar</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+        background-color: #f8f9fa;
+    }
+    .login-container {
+        min-height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .login-card {
+        background: white;
+        padding: 80px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 400px; 
+        min-height: 400px;
+    }
+    .login-card .form-control {
+        border-radius: 20px;
+    }
+    .login-card button {
+        background-color: #28a745;
+        border-color: #28a745;
+        border-radius: 20px;
+    }
+    .login-card .forgot-password {
+        float: right;
+    }
+    .password-field {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+        }
+    .footer {
+        background-color: #000;
+        color: #fff;
+        padding: 20px 0;
+        text-align: center;
+    }
+    </style>
+</head>
+<body>
+    <header class="bg-white shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand" href="#"><img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="50" > </a>
+               
+                <!-- <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Shopping Cart: $57.00</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Call: (219) 555-0114</a>
+                    </li>
+                </ul> -->
+            </div>
+        </nav>
+    </header>
+
+    <div class="login-container">
+        <div class="login-card">
+            <h3 class="mb-4">ADMIN LOGIN</h3>
+           
+            <form id="adminLogin">
+                <div class="form-group">
+                    <input type="" class="form-control" name="username" value="admin123" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <div class="password-field">
+                        <input type="password" class="form-control" name="password" value="admin123" placeholder="Password" required>
+                        <i class="fas fa-eye password-toggle"></i>
+                    </div>
+                </div>
+                <div class="form-group form-check text-left">
+                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                    <!-- <a href="#" class="forgot-password">Forgot Password</a> -->
+                </div>
+                <button type="submit" class="btn btn-success btn-block">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- <h5>HarvestBazar</h5> -->
+                    <a class="navbar-brand" href="#"><img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="50" > </a>
+                    <p></p>
+                    <p>1800-4587-7845 or <a href="mailto:proxy@gmail.com" class="text-white">harvestbazar@gmail.com</a></p>
+                </div>
+            
+                
+            </div>
+            <div class="mt-3">
+                <!-- <img src="payment-icons.png" alt="Payment Methods" class="img-fluid"> -->
+                <p class="mt-2">HarvestBazar eCommerce © 2021. All Rights Reserved</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Password toggle functionality
+        document.querySelectorAll('.password-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.classList.remove('fa-eye');
+                    this.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    this.classList.remove('fa-eye-slash');
+                    this.classList.add('fa-eye');
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded',()=>{
+            fetch('/admin/login')
+                .then(response =>{
+                    if(!response.ok){
+                        return response.json().then(data =>{
+                            Swal.fire({
+                                icon:'error',
+                                title:'Oops...',
+                                text:data.message || 'An unexpected error occured!',
+                                confirmButtonText:'OK'
+                            })
+                        })
+                    }
+                }).catch(err =>{
+                    Swal.fire({
+                        icon:'error',
+                        title:'Internal error',
+                        text:'Something went wrong',
+                        confirmButtonText:'OK'
+                    })
+                })
+        })
+
+        document.getElementById('adminLogin').addEventListener('submit',async(e)=>{
+            e.preventDefault()
+
+            const formData = new FormData(e.target)
+            const result = Object.fromEntries(formData.entries())
+
+            try {
+                const response = await fetch('/admin/login',{
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                    body: JSON.stringify(result)
+                })
+
+                const data = await response.json()
+                if(data.success){
+                    Swal.fire({
+                        icon:'success',
+                        title:'Success',
+                        text:data.message,
+                        confirmButtonText:'OK'
+                    }).then(()=>{
+                        window.location.href = '/admin/dashboard'
+                    })
+                } else {
+                    Swal.fire({
+                        icon:'error',
+                        title:'Error',
+                        text:data.message,
+                        confirmButtonText:'OK'
+                    })
+                }
+            } catch (error) {
+                console.error(error)
+                Swal.fire({
+                    icon:'error',
+                    title:'internal server error',
+                    text:'Something went wrong',
+                    confirmButtonText:'OK'
+                })
+            }
+        })
+    </script>
+</body>
+</html>

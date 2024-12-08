@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Book - HarvestBazar</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+         :root {
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --primary-color: #00B207;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+
+        /* Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: white;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            padding: calc(var(--header-height) + 1rem) 1rem 1rem;
+            transition: all 0.3s;
+            z-index: 999;
+            border-right: 1px solid #eee;
+        }
+
+        .sidebar.collapsed {
+            left: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar .nav-link {
+            color: #666;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1001;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* Address Card Styles */
+        .address-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #eee;
+        }
+
+        .address-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        .btn-edit {
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 0.3rem 1rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .btn-edit:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Form Styles */
+        .form-control {
+            padding: 0.8rem;
+            border-radius: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.8rem 2rem;
+        }
+
+        .btn-primary:hover {
+            background-color: #009706;
+            border-color: #009706;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 991px) {
+            .sidebar {
+                left: calc(-1 * var(--sidebar-width));
+            }
+            
+            .sidebar.show {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            .sidebar-toggle {
+                display: block;
+            }
+            
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 998;
+            }
+            
+            .overlay.show {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Header -->
+    <header class="header">
+        <button class="btn btn-link sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a class="navbar-brand ms-3" href="/">
+            <img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="40">
+        </a>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar shadow-sm" id="sidebar">
+        <nav class="nav flex-column">
+            <a href="/userDashboard" class="nav-link ">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="/orders" class="nav-link">
+                <i class="fas fa-shopping-basket"></i> Order History
+            </a>
+            <a href="/wishlist" class="nav-link">
+                <i class="fas fa-heart"></i> Wishlist
+            </a>
+            <a href="/shoppingCart" class="nav-link">
+                <i class="fas fa-shopping-cart"></i> Shopping Cart
+            </a>
+            <a href="/profile" class="nav-link">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+            <a href="" class="nav-link active">
+                <i class="fas fa-address-book"></i> Address Book
+            </a>
+            <a href="/wallet" class="nav-link">
+                <i class="fas fa-wallet"></i> Wallet
+            </a>
+            <!-- <a href="#" class="nav-link">
+                <i class="fas fa-gift"></i> Referral Bonus
+            </a> -->
+            <a href="/logout" class="nav-link">
+                <i class="fas fa-sign-out-alt"></i> Log-out
+            </a>
+        </nav>
+    </div>
+
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <!-- Page Title -->
+            <h2 class="mb-4">Address Book</h2>
+    
+            <!-- Add New Address Button (Triggers Modal) -->
+            <button type="button" class="btn btn-success mb-4" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                + New Address
+            </button>
+    
+            <!-- Saved Addresses Section -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Saved Addresses</h5>
+                            <!-- Loop through addresses -->
+                             <% if(addresses.length === 0){ %>
+                                <p>No address found. Please add new address</p>
+                            <% } else { %>
+                                <% addresses.forEach((address, index)=>{ %>
+                                <div class="address-item mb-4">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-2"><%= address.firstName %> <%= address.lastName %></h6>
+                                            <p class="mb-1"><%= address.street %>, <%= address.city %>, <%= address.state %>, <%= address.zipcode %> </p>
+                                            <p class="mb-0">Phone: <%= address.mobile %></p>
+                                        </div>
+                                        <div class="d-flex flex-column align-items-end">
+                                            <!--Edit button-->
+                                            <form action="/addressbook/<%= address._id %>/edit" method="get">
+                                                <button type="submit" class="btn btn-sm btn-outline-primary mb-2">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                            </form>
+
+                                            <!-- Delete Button -->
+                                            <form >
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteAddress('<%= address._id %>')">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                            <form >
+                                                <div class="form-check mt-2">
+                                                    <input class="form-check-input" type="radio" name="defaultAddress" value="<%= address._id %>" id="address<%= index %>" <%= address.isDefault ? 'checked' : '' %> onchange="setDefaultAddress('<%= address._id %>')">
+                                                    <label class="form-check-label" for="address<%= index %>">
+                                                        Default
+                                                    </label>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }) %>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Add Address Modal -->
+            <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form  id="addressForm">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="addFirstName" class="form-label">First Name</label>
+                                        <input type="text" name="firstName" id="addFirstName" class="form-control" placeholder="John" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="addLastName" class="form-label">Last Name</label>
+                                        <input type="text" name="lastName" id="addLastName" class="form-control" placeholder="Doe" required>
+                                    </div>
+                                  
+                                </div>
+                                <div class="mb-3">
+                                    <label for="addStreet" class="form-label">Street Address</label>
+                                    <input type="text" name="street" id="addStreet" class="form-control" placeholder="123 Main St" required>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="addCity" class="form-label">City</label>
+                                        <input type="text" name="city" id="addCity" class="form-control" placeholder="City" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="addState" class="form-label">State</label>
+                                        <input type="text" name="state" id="addState" class="form-control" placeholder="State" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="addCountry" class="form-label">Country</label>
+                                        <input type="text" name="country" id="addCountry" class="form-control" placeholder="Country" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="addZipCode" class="form-label">Zip Code</label>
+                                        <input type="text" name="zipcode" id="addZipCode" class="form-control" placeholder="580123" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                   
+                                    <div class="col-md-6 mb-3">
+                                        <label for="addPhone" class="form-label">Phone</label>
+                                        <input type="tel" name="mobile" id="addPhone" class="form-control" placeholder="9994785210" required>
+                                    </div>
+                                </div>
+                               
+                                
+                                <div class="d-flex justify-content-end mt-4">
+                                    <button type="submit" class="btn btn-primary">Save Address</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            
+        </div>
+    </main>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sidebar Toggle Functionality
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('show');
+            document.getElementById('overlay').classList.toggle('show');
+        });
+
+        document.getElementById('overlay').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+        });
+
+    
+        document.addEventListener('DOMContentLoaded', function() {
+
+            fetch('/addressbook')
+                .then(response =>{
+                    if(!response.ok){
+                        return response.json().then(data =>{
+                            Swal.fire({
+                                icon:'error',
+                                title:'Oops...',
+                                text:data.message || 'An unexpected error occured!',
+                                confirmButtonText:'OK'
+                            })
+                        })
+                    }
+                }).catch(err =>{
+                    console.error(err)
+                    Swal.fire({
+                        icon:'error',
+                        title:'Network error',
+                        text:'Something went wrong',
+                        confirmButtonText:"OK"
+                    })
+                })
+        })
+    
+
+    document.getElementById('addressForm').addEventListener('submit',async(e)=>{
+        e.preventDefault()
+
+        const formData = new FormData(e.target)
+        const result = Object.fromEntries(formData.entries())
+
+        const { errors: validationErrors , trimmedAddress } = validateAddress(result);
+        if (validationErrors.length > 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: validationErrors.join(', '),
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        try {
+            const response = await fetch('/addressbook/add',{
+                method:'POST',
+                headers:{
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(result)
+            })
+
+            const data = await response.json()
+            if(data.success){
+                Swal.fire({
+                    icon:'success',
+                    title:'Success',
+                    text: data.message,
+                    confirmButtonText:'OK'
+                }).then(()=>{
+                    location.reload()
+                })
+            } else {
+                Swal.fire({
+                    icon:'error',
+                    title:'Error',
+                    text: data.message,
+                    confirmButtonText:'OK'
+                })
+            }
+        } catch (error) {
+            console.error(error)
+            Swal.fire({
+                icon:'error',
+                title:'error',
+                text:'something went wrong',
+                confirmButtonText:'OK'
+            })
+        }
+    })
+
+
+    function validateAddress(address) {
+        const errors = [];
+        const trimmedAddress = {};
+
+        for (const key in address) {
+            trimmedAddress[key] = address[key].trim();
+        }
+
+       
+        for (const key in trimmedAddress) {
+            if (!trimmedAddress[key]) {
+                errors.push(`${key} is required`);
+            }
+        }
+
+        
+        for (const key in trimmedAddress) {
+            if (key !== 'mobile' && key !== 'zipcode' && key !== 'lastName' && trimmedAddress[key].length < 3) {
+                errors.push(`${key} must be at least 3 characters long`);
+            }
+        }
+
+        if (trimmedAddress.zipcode && !/^\d{6}$/.test(trimmedAddress.zipcode)) {
+            errors.push('Zip Code should be exactly 6 digits');
+        }
+
+       
+        if (trimmedAddress.mobile && !/^[6-9]\d{9}$/.test(trimmedAddress.mobile)) {
+            errors.push('Mobile number should contains 10 digits and start inbetween 6-9 digits');
+        }
+
+       
+        if (trimmedAddress.firstName && !/^[a-zA-Z\s]+$/.test(trimmedAddress.firstName)) {
+            errors.push('First name should only contain letters');
+        }
+        if (trimmedAddress.lastName && !/^[a-zA-Z\s]+$/.test(trimmedAddress.lastName)) {
+            errors.push('Last name should only contain letters');
+        }
+        if(trimmedAddress.state && !/^[a-zA-Z\s]+$/.test(trimmedAddress.state)){
+            errors.push('State name contains only letters')
+        }
+        if(trimmedAddress.country && !/^[a-zA-Z\s]+$/.test(trimmedAddress.country)){
+            errors.push('Country name should contains only letters')
+        }
+
+        return { errors, trimmedAddress };
+    }
+
+
+    function setDefaultAddress(addressId){
+        fetch(`/addressbook/${addressId}/default`,{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({ defaultAddress:true}),
+        }).then(async (response) => {
+                    if (!response.ok) {
+                        // Attempt to parse JSON for error message
+                        const errorData = await response.json();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorData.message || 'An unknown error occurred',
+                            confirmButtonText: 'OK',
+                        });
+                        return; // Exit early on error
+                    }
+
+                    // Success case
+                    const data = await response.json();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'success!',
+                        text: data.message ,
+                        confirmButtonText: 'OK',
+                    }).then(() => {
+                        location.reload(); // Reload the page to update UI
+                    });
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message || 'An unknown error occurred while processing the request',
+                        confirmButtonText: 'OK',
+                    });
+                });
+        }
+    
+
+    function deleteAddress(addressId){
+        Swal.fire({
+            title:'Are you sure?',
+            text:"You won't be able to revert this!",
+            icon:'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText:'Yes, delete it!', 
+        }).then((result)=>{
+            if(result.isConfirmed){
+                fetch(`/addressbook/${addressId}/delete`,{
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json',
+                    },
+                    body: JSON.stringify({})
+                }).then(async (response) => {
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorData.message || 'An unknown error occurred',
+                            confirmButtonText: 'OK',
+                        });
+                        return;
+                    }
+
+                 
+                    const data = await response.json();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: data.message || 'Address deleted successfully!',
+                        confirmButtonText: 'OK',
+                    }).then(() => {
+                        location.reload(); 
+                    });
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message || 'An unknown error occurred while processing the request',
+                        confirmButtonText: 'OK',
+                    });
+                });
+        }
+    });
+}
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Products in <%= category.name %></title>
+    
+    <style>
+        .product-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.product-table th,
+.product-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.product-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+}
+
+.back-btn {
+    display: inline-block;
+    padding: 10px;
+    margin-top: 10px;
+    color: #fff;
+    background-color: #333;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Products in Category: <%= category.name %></h1>
+        <!-- Products Table -->
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Image</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% products.forEach(product => { %>
+                    <tr>
+                        <td><%= product.name %></td>
+                        <td><img src="<%= product.images[0] %>" alt="<%= product.name %>" class="product-img"></td>
+                        <td>₹<%= product.price.toFixed(2) %></td>
+                        <td><%= product.stock %></td>
+                        <td><span class="badge <%= product.stock > 0 ? 'bg-success' : 'bg-danger' %>">
+                            <%= product.stock > 0 ? 'In Stock' : 'Out of Stock' %>
+                        </span></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+
+        <!-- Display message if no products found -->
+        <% if (products.length === 0) { %>
+            <p>No products found under this category.</p>
+        <% } %>
+    </div>
+</body>
+</html>

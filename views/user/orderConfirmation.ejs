@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        .success-checkmark {
+            width: 80px;
+            height: 80px;
+            background-color: #198754;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        .order-card {
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 1rem 0;
+        }
+        .btn-custom {
+            min-width: 160px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <div class="card order-card">
+                    <div class="card-body p-4 p-md-5">
+                        <!-- Success Message -->
+                        <div class="text-center mb-4">
+                            <div class="success-checkmark mb-3">
+                                <i class="fas fa-check text-white fa-2x"></i>
+                            </div>
+                            <h1 class="h3 mb-2">Order Confirmed!</h1>
+                            <p class="text-muted">Thank you for your purchase. Your order has been received.</p>
+                        </div>
+
+                        <!-- Order Details -->
+                        <div class="bg-light p-4 rounded-3 mb-4">
+                            <div class="row">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <h5 class="fw-bold">Order ID: <%= order._id %></h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5 class="fw-bold">Date</h5>
+                                    <!-- Display current date dynamically -->
+                                    <p class="mb-0"><%= new Date().toLocaleDateString() %></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Items -->
+                        <h5 class="fw-bold mb-3">Order Summary</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <tbody>
+                                    <% order.items.forEach(item => { %>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="<%= item.product.images[0] %>" class="rounded me-3" alt="<%= item.product.name %>" style="width: 50px; height: 50px; object-fit: cover;">
+                                                <div>
+                                                    <h6 class="mb-0"><%= item.product.name %></h6>
+                                                    <small class="text-muted">Quantity: <%= item.quantity %></small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-end">₹<%= item.product.priceAfterDiscount.toFixed(2) %></td>
+                                    </tr>
+                                    <% })  %>
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <td>Subtotal</td>
+                                        <td class="text-end">₹<%= order.totalPrice.toFixed(2) %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Discount</td>
+                                        <td class="text-end">₹<%= order.discountAmount.toFixed(2) %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Delivery Charge</td>
+                                        <td class="text-end">₹<%= order.shipping.toFixed(2) %></td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td class="fw-bold">Total</td>
+                                        <td class="text-end fw-bold">₹<%= order.totalPriceAfterDiscount.toFixed(2) %></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Payment & Shipping -->
+                        <div class="row">
+                            <div class="col-md-6 mb-4 mb-md-0">
+                                <h5 class="fw-bold mb-3">Payment Method</h5>
+                                <div class="d-flex align-items-center">
+                                    <!-- Display payment method dynamically -->
+                                    
+                                    <%  if (order.paymentMethod === 'Online-payment') { %>
+                                        <i class="far fa-credit-card fa-2x me-2 text-danger"></i>
+                                        <p>ONLINE PAYMENT (<%= order.paymentStatus %>)</p>
+                                    <% } else if (order.paymentMethod === 'cod') { %>
+                                        <i class="fas fa-money-bill-wave fa-2x me-2 text-success"></i>
+                                        <p>CASH ON DELIVERY</p>
+                                    <% } else if (order.paymentMethod === 'Wallet'){ %>
+                                        <i class="fas fa-wallet fa-2x me-2 text-success"></i>
+                                        <p>Wallet Pay</p>
+                                    <% } %>
+                                    <div>
+                                        <p class="mb-0"> </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="fw-bold mb-3">Shipping Address</h5>
+                                <!-- Display dynamic shipping address -->
+                                <p class="mb-0">
+                                    <%= order.shippingAddress.firstName %> <%= order.shippingAddress.lastName %><br>
+                                    <%= order.shippingAddress.street %><br>
+                                    <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <%= order.shippingAddress.zipcode %><br>
+                                    <%= order.shippingAddress.country %><br>
+                                    Phone: <%= order.shippingAddress.mobile %>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Action Buttons -->
+                        <div class="text-center">
+                            <div class="row justify-content-center gap-2">
+                                <div class="col-12 col-sm-auto">
+                                    <a href="/orders" class="btn btn-primary btn-custom mb-2 mb-sm-0">
+                                        <i class="fas fa-shopping-bag me-2"></i>View Order
+                                    </a>
+                                </div>
+                                <div class="col-12 col-sm-auto">
+                                    <a href="/" class="btn btn-outline-secondary btn-custom">
+                                        <i class="fas fa-home me-2"></i>Back to Home
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

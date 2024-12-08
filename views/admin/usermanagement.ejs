@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users List</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Existing sidebar styles */
+        .logo-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            padding: 15px;
+            background: white;
+            z-index: 1030;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: -250px;
+            width: 250px;
+            height: calc(100vh - 60px);
+            background: #fff;
+            transition: 0.3s;
+            z-index: 1020;
+            overflow-y: auto;
+            border-right: 1px solid #eee;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+        .nav-link {
+            color: #666;
+            padding: 10px 20px;
+        }
+
+        .nav-link:hover {
+            background-color: #f8f9fa;
+        }
+
+        .nav-link.active {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .main-content {
+            margin-left: 0;
+            transition: 0.3s;
+            padding-top: 60px;
+        }
+
+        .main-content.active {
+            margin-left: 250px;
+        }
+
+        .toggle-btn {
+            position: fixed;
+            top: 15px;
+            left: 260px;
+            z-index: 1040;
+            transition: 0.3s;
+            display: none;
+        }
+
+        .toggle-btn.active {
+            left: 260px;
+        }
+
+        .mobile-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1040;
+            display: none;
+        }
+        @media (min-width: 992px) {
+            .sidebar {
+                left: 0;
+            }
+            .main-content {
+                margin-left: 250px;
+            }
+            .toggle-btn {
+                display: none;
+            }
+            .mobile-toggle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 991px) {
+            .logo-container {
+                left: -250px;
+            }
+            .logo-container.active {
+                left: 0;
+            }
+            .mobile-toggle {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+
+
+        /* Users List specific styles */
+        .main-content {
+            margin-left: 0;
+            transition: 0.3s;
+            padding: 80px 20px 20px;
+        }
+
+        .main-content.active {
+            margin-left: 250px;
+        }
+
+        .users-container {
+            background-color: #1e2022;
+            border-radius: 10px;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .add-user-btn {
+            background-color: #00a651;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .add-user-btn:hover {
+            background-color: #008c44;
+        }
+
+        .users-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .users-table th {
+            color: #6c757d;
+            font-weight: normal;
+            padding: 12px 8px;
+            font-size: 14px;
+        }
+
+        .users-table td {
+            padding: 12px 8px;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        .status-active {
+            background-color: rgba(0, 166, 81, 0.1);
+            color: #00a651;
+        }
+
+        .status-inactive {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .edit-link {
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .edit-link:hover {
+            color: #fff;
+        }
+
+        .checkbox-wrapper {
+            width: 20px;
+        }
+
+        .custom-checkbox {
+            width: 16px;
+            height: 16px;
+            background-color: transparent;
+            border: 1px solid #6c757d;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        @media (min-width: 992px) {
+            .sidebar {
+                left: 0;
+            }
+            .main-content {
+                margin-left: 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .users-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .main-content {
+                padding: 80px 10px 10px;
+            }
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .status-active {
+            background-color: #28a745; /* Green for active */
+        }
+        .status-blocked {
+            background-color: #dc3545; /* Red for blocked */
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Your existing sidebar code here -->
+    <div class="logo-container">
+        <a class="navbar-brand " href="#"><img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="50" > </a>
+    </div>
+
+    <!-- Mobile Toggle Button -->
+    <button class="btn btn-light mobile-toggle" id="mobileToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Desktop Toggle Button -->
+    <button class="btn btn-light toggle-btn" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar mt-3" id="sidebar">
+        <nav class="nav flex-column">
+            <a class="nav-link" href="/admin/dashboard"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+            <a class="nav-link" href="/admin/orders"><i class="fas fa-shopping-cart me-2"></i> Orders</a>
+            <a class="nav-link" href="/admin/productcategories"><i class="fas fa-list me-2"></i> Product Categories</a>
+            <a class="nav-link" href="/admin/products"><i class='fas fa-bookmark me-2'></i> Products</a>
+            <a class="nav-link active" href="#"><i class="fas fa-users me-2"></i> User Management</a>
+            <!-- <a class="nav-link" href="#"><i class="fas fa-chart-bar me-2"></i> Sales Report</a> -->
+            <a class="nav-link" href="/admin/coupons"><i class="fas fa-ticket-alt me-2"></i> Coupons</a>
+            <a class="nav-link" href="/admin/offers"><i class="fa-solid fa-gift me-2"></i> Offers</a>
+            <a class="nav-link" href="/admin/logout"><i class="fas fa-sign-out-alt me-2"></i> Log-out</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content active">
+        <div class="users-container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fs-2">Users List</h6>
+                
+            </div>
+            <div class="mb-3">
+                <form action="/admin/usermanagement/search" method="get">
+                    <input type="text" id="userSearch" class="form-control" name="q" placeholder="Search by Name or Email" style="width: 400px;">
+                </form>    
+            </div>
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        
+                        <th>FirstName</th>
+                        <th>LastName</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user => { %>
+                    <tr>
+                      
+                        <td><%= user.firstName %></td>
+                        <td><%= user.lastName %></td>
+                        <td><%= user.email %></td>
+                        <td>
+                            <span class="status-badge <%= user.isBlocked ? 'status-blocked' : 'status-active' %>">
+                                <%= user.isBlocked ? 'Blocked' : 'Active' %>
+                            </span>
+                        </td>
+                        <td>
+                            <% if (user.isBlocked) { %>
+                                <form action="/admin/usermanagement/unblock/<%= user._id %>" method="post" style="display: inline;">
+                                    <button class="btn btn-success" type="submit">unblock</button>
+                                </form>
+                                <% } else { %>
+                                    <form action="/admin/usermanagement/block/<%= user._id %>" method="post" style="display: inline;">
+                                        <button class="btn btn-danger" type="submit">Block</button>
+
+                                    </form>
+                                    <% } %>
+                        </td>
+                    </tr>
+                    <% }); %>
+                    <tr>
+                </tbody>
+            </table>
+        </div>
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                    <a class="page-link" href="/admin/usermanagement?page=<%= currentPage - 1 %>" tabindex="-1">«</a>
+                </li>
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="/admin/usermanagement?page=<%= i %>"><%= i %></a>
+                </li>
+                <% } %>
+
+                <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                    <a class="page-link" href="/admin/usermanagement?page=<%= currentPage + 1 %>">»</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+          const sidebar = document.getElementById('sidebar');
+        const main = document.getElementById('main');
+        const logo = document.querySelector('.logo-container');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const mobileToggle = document.getElementById('mobileToggle');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            main.classList.toggle('active');
+            logo.classList.toggle('active');
+            toggleBtn.classList.toggle('active');
+        }
+
+        toggleBtn.addEventListener('click', toggleSidebar);
+        mobileToggle.addEventListener('click', toggleSidebar);
+       
+        document.addEventListener('DOMContentLoaded',()=>{
+            fetch('/admin/usermanagement')
+                .then(response =>{
+                    if(!response.ok){
+                        return response.json().then(data =>{
+                            Swal.fire({
+                                icon:'error',
+                                title:'Oops...',
+                                text:data.message || 'An unexpected error occured!',
+                                confirmButtonText:'OK'
+                            })
+                        })
+                    }
+                }).catch(err=>{
+                    Swal.fire({
+                        icon:'error',
+                        title:'Internal server error',
+                        text:'something went wrong',
+                        confirmButtonText:'OK'
+                    })
+                })
+        })
+    </script>
+</body>
+</html>

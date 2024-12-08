@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f6fa;
+        }
+
+        .main-content {
+            margin-left: 260px; /* Space for sidebar */
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .card-header {
+            background: linear-gradient(45deg, #4b6cb7, #182848);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            color: white;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .btn-add {
+            background: #2ecc71;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-add:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .table-responsive {
+            padding: 1rem;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0.5rem;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            padding: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            padding: 1rem;
+            vertical-align: middle;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        .table tr:hover td {
+            background: #f8f9fa;
+        }
+
+        .category-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .empty-image-placeholder {
+            width: 60px;
+            height: 60px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #95a5a6;
+            font-size: 0.8rem;
+            border: 2px dashed #ddd;
+        }
+
+        .fw-medium {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .d-flex {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-action {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-edit {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-view {
+            background: #f1c40f;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #f39c12;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3);
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .table tr {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .main-content {
+                margin-left: 240px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .main-content {
+                margin-left: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+        }
+        .logo-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            padding: 15px;
+            background: white;
+            z-index: 1030;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: -250px;
+            width: 250px;
+            height: calc(100vh - 60px);
+            background: #fff;
+            transition: 0.3s;
+            z-index: 1020;
+            overflow-y: auto;
+            border-right: 1px solid #eee;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .nav-link {
+            color: #666;
+            padding: 10px 20px;
+        }
+
+        .nav-link:hover {
+            background-color: #f8f9fa;
+        }
+
+        .nav-link.active {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .main-content {
+            margin-left: 0;
+            transition: 0.3s;
+            padding-top: 60px;
+        }
+
+        .main-content.active {
+            margin-left: 250px;
+        }
+
+        .toggle-btn {
+            position: fixed;
+            top: 15px;
+            left: 260px;
+            z-index: 1040;
+            transition: 0.3s;
+            display: none;
+        }
+
+        .toggle-btn.active {
+            left: 260px;
+        }
+
+        .mobile-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1040;
+            display: none;
+        }
+        @media (min-width: 992px) {
+            .sidebar {
+                left: 0;
+            }
+            .main-content {
+                margin-left: 250px;
+            }
+            .toggle-btn {
+                display: none;
+            }
+            .mobile-toggle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 991px) {
+            .logo-container {
+                left: -250px;
+            }
+            .logo-container.active {
+                left: 0;
+            }
+            .mobile-toggle {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+      
+    </style>
+</head>
+<body>
+    <div class="logo-container">
+        <a class="navbar-brand " href="#"><img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="50" > </a>
+    </div>
+
+    <!-- Mobile Toggle Button -->
+    <button class="btn btn-light mobile-toggle" id="mobileToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Desktop Toggle Button -->
+    <button class="btn btn-light toggle-btn" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar mt-3" id="sidebar">
+        <nav class="nav flex-column">
+            <a class="nav-link" href="/admin/dashboard"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+            <a class="nav-link" href="/admin/orders"><i class="fas fa-shopping-cart me-2"></i> Orders</a>
+            <a class="nav-link active" href="/admin/productcategories"><i class="fas fa-list me-2"></i> Product Categories</a>
+            <a class="nav-link" href="/admin/products"><i class='fas fa-bookmark me-2'></i> Products</a>
+            <a class="nav-link" href="/admin/usermanagement"><i class="fas fa-users me-2"></i> User Management</a>
+            <!-- <a class="nav-link" href="#"><i class="fas fa-chart-bar me-2"></i> Sales Report</a> -->
+            <a class="nav-link" href="/admin/coupons"><i class="fas fa-ticket-alt me-2"></i> Coupons</a>
+            <a class="nav-link" href="/admin/offers"><i class="fa-solid fa-gift me-2"></i> Offers</a>
+            <a class="nav-link" href="/admin/logout"><i class="fas fa-sign-out-alt me-2"></i> Log-out</a>
+        </nav>
+    </div>
+    <div class="main-content">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Product Categories</h2>
+                <a href="/admin/productcategories/addcategories" class="btn-add">
+                    <i class="fas fa-plus"></i>
+                    Add New Category
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Category Name</th>
+                            <th>Image</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% categories.forEach(category => { %>
+                           
+                                <tr class="<%= category.isDeleted ? 'text-muted' : '' %>">
+                                    <td class="fw-medium"><%= category.name %></td>
+                                    <td>
+                                        <span class="badge bg-danger sale-badge "><%= category.offerDiscount %>% Off</span>
+
+                                        <% if (category.image) { %>
+                                            <img src="<%= category.image %>" alt="<%= category.name %>" class="category-image">
+                                        <% } else { %>
+                                            <div class="empty-image-placeholder">No Image</div>
+                                        <% } %>
+                                    </td>
+                                    <td class="fw-medium">
+                                        <%= category.isDeleted ? 'Unlisted' : 'Listed' %>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <a href="/admin/productcategories/<%= category._id %>/editcategories" class="btn-action btn-edit">
+                                                <i class="fas fa-edit"></i>
+                                                Edit
+                                            </a>
+                                            <a href="/admin/productcategories/<%= category._id %>/products" class="btn-action btn-view">
+                                                <i class="fas fa-eye"></i>
+                                                View
+                                            </a>
+                                            <form action="/admin/productcategories/<%= category._id %>/delete" method="post" style="display:inline;">
+                                                <button type="submit" class="btn <%= category.isDeleted ? 'btn-success' : 'btn-danger' %>">
+                                                    <i class="fas fa-trash"></i>
+                                                   <%= category.isDeleted ? 'List' : 'Unlist' %>
+                                                </button>
+                                            </form>
+                                            <button type="button" class="btn btn-primary" onclick="openOfferModal('<%= category._id %>')">
+                                                <i class="fas fa-tag"></i> Apply Offer
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                           
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!--apply offer-->
+    <div class="modal fade" id="applyOfferModal" tabindex="-1" aria-labelledby="applyOfferModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="applyOfferModalLabel">Apply Offer to Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="applyOfferForm" action="/admin/applyOfferToCategory" method="post">
+                        <input type="hidden" name="categoryId" id="categoryIdInput">
+                        
+                        <div class="mb-3">
+                            <label for="offerSelect" class="form-label">Select Offer</label>
+                            <select id="offerSelect" name="offerId" class="form-select" >
+                                <option value="">None</option>
+                                <% offers.forEach(offer=>{ %>
+                                    <option value="<%= offer._id %>"><%= offer.title %> - <%= offer.discount %>% Off</option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success">Apply Offer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script>
+        // Sidebar Toggle Functionality
+        const sidebar = document.getElementById('sidebar');
+        const main = document.getElementById('main');
+        const logo = document.querySelector('.logo-container');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const mobileToggle = document.getElementById('mobileToggle');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            main.classList.toggle('active');
+            logo.classList.toggle('active');
+            toggleBtn.classList.toggle('active');
+        }
+
+        toggleBtn.addEventListener('click', toggleSidebar);
+        mobileToggle.addEventListener('click', toggleSidebar);
+
+
+        document.addEventListener('DOMContentLoaded',()=>{
+            fetch('/admin/productcategories')
+                .then(response =>{
+                    if(!response.ok){
+                        return response.json().then(data =>{
+                            Swal.fire({
+                                icon:'error',
+                                title:'Oops...',
+                                text:data.message,
+                                confirmButtonText:'OK'
+                            })
+                        })
+                    }
+                }).catch(err =>{
+                    console.error(err)
+                    Swal.fire({
+                        icon:'error',
+                        title:'Internal server error',
+                        text:'something went wrong!',
+                        confirmButtonText:'OK'
+                    })
+                })
+        })
+
+
+        //apply offer
+        function openOfferModal(categoryId) {
+       
+        document.getElementById('categoryIdInput').value = categoryId;
+
+            new bootstrap.Modal(document.getElementById('applyOfferModal')).show();
+        };
+
+
+
+    
+    document.getElementById('applyOfferForm').addEventListener('submit', function (e) {
+    e.preventDefault(); 
+
+    const categoryId = document.getElementById('categoryIdInput').value;
+    const offerId = document.getElementById('offerSelect').value;
+
+    fetch('/admin/applyOfferToCategory', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ categoryId, offerId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+           
+            Swal.fire({
+                icon: 'success',
+                title: 'Offer Updated!',
+                text: data.message,
+                confirmButtonText: 'OK'
+            }).then(() => {
+                
+                location.reload();
+            });
+        } else {
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Error in updating',
+                text: data.message,
+                confirmButtonText: 'OK'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Unexpected Error',
+            text: 'An unexpected error occurred. Please try again later.',
+            confirmButtonText: 'OK'
+        });
+    });
+});
+    </script>
+</body>
+</html>

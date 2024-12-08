@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - HarvestBazar</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        
+        .password-field {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+        }
+        
+        
+        .form-control:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+        
+        .btn-green {
+            background-color: #00B517;
+            border-color: #00B517;
+            color: white;
+        }
+        
+        .btn-green:hover {
+            background-color: #009713;
+            border-color: #009713;
+            color: white;
+        }
+        
+        .google-btn {
+            border: 1px solid #ddd;
+            background-color: white;
+            color: #666;
+        }
+        
+        .google-btn img {
+            width: 18px;
+            margin-right: 8px;
+        }
+        
+        .footer {
+            background-color: #1B1C1E;
+            color: #ffffff;
+            padding: 50px 0;
+        }
+        
+        .footer-text {
+            color: #898989;
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-white shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand" href="#"><img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="50"> </a>
+                
+            </div>
+        </nav>
+    </header>
+
+   
+
+    <!-- Signup Form -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="text-center mb-4">Create Account</h4>
+                        <% if (typeof error !== 'undefined') { %>
+                            <p style="color: red;"><%= error %></p>  <!-- Show error message if any -->
+                          <% } %>
+                        <form id="signupForm">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" name="firstName" placeholder="First Name" required>
+                                    <span class="error-message" style="color: red;" id="firstNameError"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" name="lastName" placeholder="Last Name" required>
+                                    <span class="error-message" style="color: red;" id="lastNameError"></span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <input type="tel" class="form-control" name="mobile" placeholder="Mobile Number" required>
+                                <span class="error-message" style="color: red;" id="mobileError"></span>
+                            </div>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" name="email" placeholder="Email" required>
+                                <span class="error-message" style="color: red;" id="emailError"></span>
+                            </div>
+                            <div class="mb-3">
+                                <div class="password-field">
+                                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                                    <i class="fas fa-eye password-toggle"></i>
+                                    <span class="error-message" style="color: red;" id="passwordError"></span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="password-field">
+                                    <input type="password" class="form-control" name="confirmPassword" placeholder="Confirm Password" required>
+                                    <i class="fas fa-eye password-toggle"></i>
+                                    <span class="error-message" style="color: red;" id="confirmPasswordError"></span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" placeholder="Have any referral code ?">
+                            </div>
+                            <div class="mb-3">
+                                <!-- <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="terms">
+                                    <label class="form-check-label" for="terms">Accept all terms & Conditions</label>
+                                </div> -->
+                            </div>
+                            <button type="submit" class="btn btn-green w-100 mb-3">OTP Verification</button>
+                            
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <a class="navbar-brand" href="#"><img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="50"> </a>
+                    <!-- <h5>HarvestBazar</h5> -->
+                    <p></p>
+                    <p>1800-4587-7845 or <a href="" class="text-white">harvestbazar@gmail.com</a></p>
+                </div>
+            </div>
+            <div class="mt-3 text-center">
+                <!-- <img src="payment-icons.png" alt="Payment Methods" class="img-fluid"> -->
+                <p class="mt-2">HarvestBazar eCommerce © 2021. All Rights Reserved</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Password toggle functionality
+        document.querySelectorAll('.password-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.classList.remove('fa-eye');
+                    this.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    this.classList.remove('fa-eye-slash');
+                    this.classList.add('fa-eye');
+                }
+            });
+        });
+
+        
+
+            document.getElementById('signupForm').addEventListener('submit',async(e)=>{
+                e.preventDefault()
+
+                const formData = new FormData(e.target)
+                const data = Object.fromEntries(formData.entries())
+
+                try {
+                    Swal.fire({
+                        title: 'Sending OTP...',
+                        text: 'Please wait while we process your request.',
+                        allowOutsideClick: false, 
+                        allowEscapeKey: false,   
+                        didOpen: () => {
+                            Swal.showLoading(); 
+                        }
+                    });
+                    const response = await fetch('/signup',{
+                        method:'POST',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+
+                    const result = await response.json()
+
+                    if(result.success){
+                        Swal.fire({
+                            icon:'success',
+                            title:'Success',
+                            text: result.message,
+                            confirmButtonText:'Proceed to OTP verification'
+                        }).then(()=>{
+                            window.location.href = `/verify-otp?email=${result.email}`
+                        })
+                    } else {
+                        Swal.fire({
+                            icon:'error',
+                            title:'Error',
+                            text: result.message,
+                            confirmButtonText:'OK'
+                        })
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        icon:'error',
+                        title:'Error',
+                        text: 'Something went wrong. Please try again later',
+                        confirmButtonText:'OK'
+                    })
+                }
+            })
+
+        //validation
+        document.addEventListener("DOMContentLoaded", function() {
+
+            fetch('/signup')
+            .then(response =>{
+                if(!response.ok){
+                    return response.json().then(data =>{
+                        Swal.fire({
+                            icon:'error',
+                            title:'Oops...',
+                            text: data.message || 'An unexpected error occured!',
+                            confirmButtonText: 'OK'
+                        })
+                    })
+                }
+            }).catch(err =>{
+                Swal.fire({
+                    icon:'error',
+                    title:'Network Error',
+                    text:'Please check your internet connection and try again',
+                    confirmButtonText : 'OK'
+                })
+            })
+
+            const form = document.getElementById("signupForm");
+
+            const firstName = form["firstName"];
+            const lastName = form["lastName"];
+            const mobile = form["mobile"];
+            const email = form["email"];
+            const password = form["password"];
+            const confirmPassword = form["confirmPassword"];
+
+            // Validation functions
+            function validateFirstName() {
+                if (!firstName.value.trim()) {
+                    showError("firstNameError", "First name is required.");
+                    return false;
+                } else if(firstName.length < 3){
+                    showError("firstNameError","Min 3 letters required")
+                } else {
+                    hideError("firstNameError");
+                    return true;
+                }
+            }
+
+            function validateLastName() {
+                if (!lastName.value.trim()) {
+                    showError("lastNameError", "Last name is required.");
+                    return false;
+                } else {
+                    hideError("lastNameError");
+                    return true;
+                }
+            }
+
+            function validateMobile() {
+                const mobilePattern = /^[0-9]{10}$/;
+                if (!mobile.value.trim()) {
+                    showError("mobileError", "Mobile number is required.");
+                    return false;
+                } else if (!mobilePattern.test(mobile.value)) {
+                    showError("mobileError", "Mobile number must be 10 digits.");
+                    return false;
+                } else {
+                    hideError("mobileError");
+                    return true;
+                }
+            }
+
+            function validateEmail() {
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email.value.trim()) {
+                    showError("emailError", "Email is required.");
+                    return false;
+                } else if (!emailPattern.test(email.value)) {
+                    showError("emailError", "Invalid email format.");
+                    return false;
+                } else {
+                    hideError("emailError");
+                    return true;
+                }
+            }
+
+            function validatePassword() {
+                if (!password.value.trim()) {
+                    showError("passwordError", "Password is required.");
+                    return false;
+                } else if (password.value.length < 6) {
+                    showError("passwordError", "Password must be at least 6 characters.");
+                    return false;
+                } else {
+                    hideError("passwordError");
+                    return true;
+                }
+            }
+
+            function validateConfirmPassword() {
+                if (confirmPassword.value !== password.value) {
+                    showError("confirmPasswordError", "Passwords do not match.");
+                    return false;
+                } else {
+                    hideError("confirmPasswordError");
+                    return true;
+                }
+            }
+
+            // Show error message
+            function showError(elementId, message) {
+                document.getElementById(elementId).textContent = message;
+            }
+
+            // Hide error message
+            function hideError(elementId) {
+                document.getElementById(elementId).textContent = "";
+            }
+
+            function cleanFormData() {
+                firstName.value = firstName.value.trim();
+                lastName.value = lastName.value.trim();
+                mobile.value = mobile.value.trim();
+                email.value = email.value.trim();
+            }
+
+            // Add event listeners for real-time validation
+            firstName.addEventListener("input", validateFirstName);
+            lastName.addEventListener("input", validateLastName);
+            mobile.addEventListener("input", validateMobile);
+            email.addEventListener("input", validateEmail);
+            password.addEventListener("input", validatePassword);
+            confirmPassword.addEventListener("input", validateConfirmPassword);
+
+            // Prevent form submission if any field is invalid
+            form.addEventListener("submit", function(event) {
+                cleanFormData()
+                if (
+                    !validateFirstName() ||
+                    !validateLastName() ||
+                    !validateMobile() ||
+                    !validateEmail() ||
+                    !validatePassword() ||
+                    !validateConfirmPassword()
+                ) {
+                    event.preventDefault(); 
+                    Swal.fire({
+                        icon:'error',
+                        title:'Validation error',
+                        text:'Please fill all fields before submitting'
+                    })
+                }
+            });
+        });
+        mobile.addEventListener("input", function() {
+        mobile.value = mobile.value.replace(/[^0-9]/g, '');
+    });
+        
+
+        
+    </script>
+</body>
+</html>

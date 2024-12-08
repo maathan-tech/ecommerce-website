@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarvestBazar Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Custom CSS */
+        :root {
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --primary-color: #00B207;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+
+        /* Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: white;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            padding: calc(var(--header-height) + 1rem) 1rem 1rem;
+            transition: all 0.3s;
+            z-index: 999;
+            border-right: 1px solid #eee;
+        }
+
+        .sidebar.collapsed {
+            left: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar .nav-link {
+            color: #666;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .main-content {
+            margin-top: 70px;
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link {
+            color: #666;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #f8f9fa;
+            color: #198754;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .profile-section {
+            text-align: center;
+            padding: 30px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1001;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status-pending {
+            background-color: orange; /* Pending orders */
+        }
+
+        .status-processing {
+            background-color: yellow; /* Paid orders that are being processed */
+        }
+
+        .status-shipped {
+            background-color: yellowgreen; /* Shipped orders */
+        }
+
+        .status-delivered {
+            background-color: green; /* Delivered orders */
+        }
+
+        .status-cancelled {
+            background-color: red; /* Cancelled orders */
+        }
+        .status-returned {
+            background-color: rgb(255, 106, 0); /* Cancelled orders */
+        }
+
+        @media (max-width: 991px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            /* .main-content.sidebar-active {
+                margin-left: 250px;
+            } */
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 998;
+            }
+            
+            .overlay.show {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="bg-light">
+<!-- Header -->
+<header class="header">
+    <button class="btn btn-link sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    <a class="navbar-brand ms-3" href="/">
+        <img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="40">
+    </a>
+</header>
+
+<!-- Sidebar -->
+<div class="sidebar shadow-sm" id="sidebar">
+    <nav class="nav flex-column">
+        <a href="" class="nav-link active">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="/orders" class="nav-link">
+            <i class="fas fa-shopping-basket"></i> Order History
+        </a>
+        <a href="/wishlist" class="nav-link">
+            <i class="fas fa-heart"></i> Wishlist
+        </a>
+        <a href="/shoppingCart" class="nav-link">
+            <i class="fas fa-shopping-cart"></i> Shopping Cart
+        </a>
+        <a href="/profile" class="nav-link">
+            <i class="fas fa-cog"></i> Settings
+        </a>
+        <a href="/addressbook" class="nav-link">
+            <i class="fas fa-address-book"></i> Address Book
+        </a>
+        <a href="/wallet" class="nav-link">
+            <i class="fas fa-wallet"></i> Wallet
+        </a>
+        <!-- <a href="#" class="nav-link">
+            <i class="fas fa-gift"></i> Referral Bonus
+        </a> -->
+        <a href="/logout" class="nav-link">
+            <i class="fas fa-sign-out-alt"></i> Log-out
+        </a>
+    </nav>
+</div>
+
+<!-- Overlay for mobile -->
+<div class="overlay" id="overlay"></div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="container-fluid">
+            <!-- Profile Section -->
+            <div class="row mb-4">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="profile-section">
+                        <% if(user) { %>
+                        <img src="<%=user.profileImage %>" alt="Profile" class="profile-img">
+                        <h4 class="mb-1"><%= user.firstName %> <%= user.lastName %></h4>
+                        <p class="text-muted mb-3">Customer</p>
+                        <!-- <button class="btn btn-success">Edit Profile</button> -->
+                        <% } else { %>
+                            <p>No user details available</p>
+                        <% } %>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Billing Address</h5>
+                            <!-- <button class="btn btn-success btn-sm">Edit Address</button> -->
+                        </div>
+                        <% if(user && defaultAddress){ %>
+                        <div class="card-body">
+                            <p class="mb-2"><strong>Email:</strong><%= user.email %></p>
+                            <p class="mb-2"><strong>Phone:</strong><%= user.mobile %></p>
+                            <p class="mb-2"><strong>Address:</strong></p>
+                            <p class="mb-1"><%=defaultAddress.street %> </p>
+                            <p class="mb-1"><%= defaultAddress.city %>, <%= defaultAddress.state %>, <%= defaultAddress.zipcode %></p>
+                            <p><%= defaultAddress.country %></p>
+                        </div>
+                        <% }else {%>
+                            <p class="text-muted text-center mt-5">No default address selected</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Recent Order History</h5>
+                            <a href="/orders" class="text-success">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ORDER ID</th>
+                                            <th>DATE</th>
+                                            <th>TOTAL</th>
+                                            <th>QUANTITY</th>
+                                            <th>STATUS</th>
+                                            <th>ACTION</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if(orders.length === 0){ %>
+                                            <tr><td colspan="6" style="text-align: center;">No orders found</td></tr>
+                                        <% } else { %>
+                                            <% orders.forEach(order => { %>
+                                            <tr>
+                                                <td><%= order._id %></td>
+                                                <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                                                <td>₹<%= (typeof order.totalAmount === 'number' && !isNaN(order.totalAmount)) ? order.totalAmount.toFixed(2) : '0.00' %></td>
+                                                <td><%= (typeof order.totalQuantity === 'number' && !isNaN(order.totalQuantity)) ? order.totalQuantity : '0' %></td>
+                                                <td>
+                                                    <span class="status-badge 
+                                                    <%= order.status === 'pending' ? 'status-pending' : '' %>
+                                                    <%= order.status === 'paid' ? 'status-processing' : '' %>
+                                                    <%= order.status === 'shipped' ? 'status-shipped' : '' %>
+                                                    <%= order.status === 'Delivered' ? 'status-delivered' : '' %>
+                                                    <%= order.status === 'Cancelled' ? 'status-cancelled' : '' %>
+                                                    <%= order.status === 'Returned' ? 'status-returned' : '' %>">
+                                                    <%= order.status %>
+                                                </span>
+                                                </td>
+                                                <td><a href="/orders/orderDetails/<%= order._id %>" class="btn-view">View Details</a></td>
+                                            </tr>
+                                            <% }) %>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded',()=>{
+            fetch('/userDashboard')
+            .then(response =>{
+                if(!response.ok){
+                    return response.json().then(data =>{
+                        Swal.fire({
+                            icon:'error',
+                            title:'Oops...',
+                            text:data.message || 'An unexpected error occured!',
+                            confirmButtonText:'OK'
+                        })
+                    })
+                }
+            }).catch(err =>{
+                Swal.fire({
+                    icon:'error',
+                    title:'Network Error',
+                    text:'Check your connection and try again',
+                    confirmButtonText:'OK'
+                })
+            })
+        })
+
+        // Sidebar Toggle Functionality
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('mainContent').classList.toggle('sidebar-active');
+        });
+
+        // Close sidebar on click outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            
+            if (window.innerWidth < 992) {  // Only on mobile
+                if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                    document.getElementById('mainContent').classList.remove('sidebar-active');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

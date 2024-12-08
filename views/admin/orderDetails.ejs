@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Details</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    /* Reset styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Global styles */
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background-color: #f5f7fa;
+    }
+
+    header {
+      background-color: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1.25rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .order-details {
+      max-width: 1000px;
+      margin: 2.5rem auto;
+      padding: 2.5rem;
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .order-details h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 1rem;
+    }
+
+    .order-details h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 1.25rem;
+    }
+
+    .shipping-address,
+    .order-info,
+    .products {
+      background-color: #f9fafb;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid #e5e7eb;
+    }
+
+    .shipping-address p,
+    .order-info p {
+      color: #4b5563;
+      margin-bottom: 0.5rem;
+    }
+
+    .product-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid #e5e7eb;
+      gap: 2rem;
+    }
+
+    .product-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .product-image {
+      width: 120px;
+      flex-shrink: 0;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-details h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 0.75rem;
+    }
+
+    .product-details p {
+      color: #6b7280;
+      margin-bottom: 0.5rem;
+    }
+
+    .order-status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 3rem 0;
+      position: relative;
+      padding: 0 2rem;
+    }
+
+    .status-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .status-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background-color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .status-item span {
+      font-size: 0.875rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .status-item.active .status-icon {
+      background-color: #10b981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+    }
+
+    .status-item.active span {
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    .status-item.cancelled .status-icon {
+      background-color: #ef4444;
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+    }
+
+    .status-item.cancelled span {
+      color: #ef4444;
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .cancel-order,
+    .invoice {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .cancel-order {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+
+    .cancel-order:hover {
+      background-color: #fecaca;
+    }
+
+    .invoice {
+      background-color: #10b981;
+      color: white;
+    }
+
+    .invoice:hover {
+      background-color: #059669;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .order-details {
+        margin: 1rem;
+        padding: 1.5rem;
+        border-radius: 12px;
+      }
+
+      .order-status {
+        flex-direction: column;
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+
+      .product-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .product-image {
+        width: 100%;
+        max-width: 200px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .cancel-order,
+      .invoice {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="navbar-brand" href="#">
+      <img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="40">
+    </a>
+  </header>
+
+  <div class="order-details">
+    <h1>Order Details</h1>
+
+    <!-- Shipping Address -->
+    <div class="shipping-address">
+      <h2>SHIPPING ADDRESS</h2>
+      <p><%= order.shippingAddress.firstName %> <%= order.shippingAddress.lastName %></p>
+      <p><%= order.shippingAddress.street %>, <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <%= order.shippingAddress.zipcode %></p>
+      <p><%= order.shippingAddress.email %></p>
+      <p><%= order.shippingAddress.mobile %></p>
+    </div>
+
+    <!-- Order Information -->
+    <div class="order-info">
+      <h2>ORDER ID: <%= order._id %></h2>
+      <p>Date: <%= order.createdAt.toLocaleDateString() %></p>
+      <p>PAYMENT METHOD: <%= order.paymentMethod %></p>
+
+      <% if(order.paymentMethod === 'Online-payment'){ %>
+        <p>PAYMENT STATUS: <%=order.paymentStatus %></p>
+      <% } %> 
+
+      <p>Subtotal: ₹<%= order.totalPrice.toFixed(2) %></p>
+      <p>Discount: ₹<%= order.discountAmount.toFixed(2) %></p>
+      <p>Shipping: ₹<%= order.shipping %></p>
+      <p class="fw-bold">Total: ₹<%= order.totalPriceAfterDiscount.toFixed(2) %></p>
+    </div>
+
+    <!-- Order Status -->
+    <div class="order-status">
+      <!-- Order Placed -->
+      <div class="status-item <%= order.status === 'pending' || order.status === 'paid' || order.status === 'shipped' || order.status === 'Delivered' ? 'active' : (order.status === 'cancelled' ? 'cancelled' : 'muted') %>">
+          <div class="status-icon"></div>
+          <span>Order received</span>
+      </div>
+  
+      <!-- Processing -->
+      <div class="status-item <%= order.status === 'paid'|| order.status === 'shipped' || order.status === 'Delivered' ? 'active' : (order.status === 'cancelled' ? 'cancelled' : 'muted') %>">
+          <div class="status-icon"></div>
+          <span>Processing</span>
+      </div>
+  
+      <!-- Shipped -->
+      <div class="status-item <%= order.status === 'shipped' || order.status === 'Delivered' ? 'active' : 'muted' %>">
+          <div class="status-icon"></div>
+          <span>Shipped</span>
+      </div>
+  
+      <!-- Delivered -->
+      <div class="status-item <%= order.status === 'Delivered' ? 'active' : 'muted' %>">
+          <div class="status-icon"></div>
+          <span>Delivered</span>
+      </div>
+  
+      <!-- Cancelled -->
+      <% if (order.status === 'Cancelled') { %>
+          <div class="status-item cancelled">
+              <div class="status-icon"></div>
+              <span>Cancelled</span>
+          </div>
+      <% } else if(order.status === 'Returned') { %>
+        <div class="status-item cancelled">
+          <div class="status-icon"></div>
+          <span>Returned</span>
+      </div>
+      <% } %>
+  </div>
+
+    <!-- Products List -->
+    <div class="products">
+      <% order.items.forEach(function(item) { %>
+        <div class="product-item">
+            <div class="product-image">
+                <% if (item.product.images && item.product.images.length > 0) { %>
+                    <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>">
+                <% } else { %>
+                    <img src="/path/to/default-image.jpg" alt="No image available">
+                <% } %>
+            </div>
+            <div class="product-details">
+                <h3><%= item.product.name %></h3>
+                <p>Original Price: <del class="text-muted"><%= item.product.price %>/kg</del></p>
+                <p>Price: ₹<%= item.price %></p>
+                <p>Quantity: <%= item.quantity %></p>
+                <p>Subtotal: ₹<%= item.price * item.quantity %></p>
+            </div>
+        </div>
+    <% }); %>
+    
+    </div>
+
+  
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const orderId = window.location.pathname.split('/')[3]
+      fetch(`/admin/order/${orderId}`)
+            .then(response =>{
+              if(!response.ok){
+                return response.json().then(data =>{
+                  Swal.fire({
+                    icon:'error',
+                    title:'Oops...',
+                    text:data.message ||'An unexpected error occured',
+                    confirmButtonText:'OK'
+                  })
+                })
+              }
+            }).catch(err =>{
+              console.error(err)
+              Swal.fire({
+                icon:'error',
+                title:'Internal sever error',
+                text:'Something went wrong!',
+                confirmButtonText:'OK'
+              })
+            })    
+    })
+  </script>
+
+</body>
+</html>

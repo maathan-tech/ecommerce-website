@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification - HarvestBazar</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #00b517;
+            --dark-bg: #1b1b1b;
+        }
+
+        /* Header Styles */
+        .top-header {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            background: white;
+        }
+
+        
+       
+
+        
+
+        /* OTP Section */
+        .otp-section {
+            padding: 30px 0 60px;
+        }
+
+        .otp-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 40px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .otp-card h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .form-control {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.2rem rgba(0, 181, 23, 0.25);
+        }
+
+        .verify-btn {
+            background: var(--primary-green);
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+
+        .verify-btn:hover {
+            background: #009714;
+        }
+
+        .resend-text {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+        }
+
+        .resend-link {
+            color: var(--primary-green);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: var(--dark-bg);
+            color: #888;
+            padding: 60px 0 30px;
+        }
+
+        .footer-logo {
+            height: 40px;
+            margin-bottom: 20px;
+        }
+
+        .footer h5 {
+            color: white;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #888;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-green);
+        }
+
+        .footer-contact {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .footer-contact i {
+            margin-right: 10px;
+            color: var(--primary-green);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .otp-card {
+                margin: 0 15px;
+                padding: 30px 20px;
+            }
+
+            .footer {
+                padding: 40px 0 20px;
+            }
+
+            .footer-section {
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand" href="#"><img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="50"> </a>
+                
+            </div>
+        </nav>
+    </header>
+
+    
+
+    <!-- OTP Section -->
+    <section class="otp-section">
+        <div class="container">
+            <div class="otp-card">
+                <h2>OTP Verification</h2>
+            
+                <form action="/verify-otp" method="post" id="verifyOTP">
+                    <div class="mb-4">
+                        <label class="form-label">Enter Confirmation Code</label>
+                        <span id="timer" style="margin-left: 10px; color: #888;"></span>
+                        <input type="hidden" name="email" value="<%= email %>"> <!-- Pass the email -->
+                        <input type="text" name="otp" class="form-control" placeholder="Confirmation Code" required>
+                    </div>
+                    <button type="submit" class="verify-btn">Verify Now</button>
+                </form>
+
+                <!-- Resend OTP form -->
+                <form  class="resend-text" style="display:inline;" id="resendOTP">
+                    <input type="hidden" name="email" value="<%= email %>"> <!-- Pass the email -->
+                    
+                    Don't receive OTP?<a href="#"  id="resendLink"  class="resend-link"> Resend Now</a>
+                    
+                </form>
+            </div>   
+        </div>
+    </section>
+    
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <a class="navbar-brand" href="#"><img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="50"> </a>
+                    <!-- <h5>HarvestBazar</h5> -->
+                    <p></p>
+                    <p>1800-4587-7845 or <a href="" class="text-light">harvestbazar@gmail.com</a></p>
+                </div>
+            </div>
+            <div class="mt-3 text-center">
+               
+                <p class="mt-2">HarvestBazar eCommerce © 2021. All Rights Reserved</p>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded',()=>{
+            fetch('/verify-otp')
+            .then(response =>{
+                if(!response.ok){
+                    return response.json().then(data =>{
+                        Swal.fire({
+                            icon:'error',
+                            title:'Oops...',
+                            text: data.message || 'An unexpected error occured!',
+                            confirmButtonText:'OK'
+                        })
+                    })
+                }
+            }).catch(err =>{
+                Swal.fire({
+                    icon:'error',
+                    title:'Network Error',
+                    text:'please check your internet connection and try again',
+                    confirmButtonText:'OK'
+                })
+            })
+        })
+
+            document.getElementById('resendLink').addEventListener('click',(e)=>{
+                e.preventDefault()
+                document.getElementById('resendOTP').dispatchEvent(new Event('submit'))
+            })
+
+            document.getElementById('resendOTP').addEventListener('submit', async(e)=>{
+                e.preventDefault()
+
+                const formData = new FormData(e.target)
+                const result = Object.fromEntries(formData.entries())
+
+                try {
+                    Swal.fire({
+                        title: 'Resending OTP...',
+                        text: 'Please wait while we process your request.',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading(); 
+                        }
+                    });
+
+                    const response = await fetch('/resend-otp',{
+                        method:'POST',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                        body: JSON.stringify(result)
+                    })
+
+                    const data = await response.json()
+
+                    if(data.success){
+                        Swal.fire({
+                            icon:'success',
+                            title:'Success',
+                            text: data.message,
+                            confirmButtonText:'OK'
+                        })
+                    } else {
+                        Swal.fire({
+                            icon:'error',
+                            title:'Error',
+                            text: data.message,
+                            confirmButtonText:"OK"
+                        })
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        icon:'error',
+                        title:'Error',
+                        text: 'Something went wrong. Please try again later',
+                        confirmButtonText:'OK'
+                    })
+                }
+            })
+
+        // Timer variables
+        const otpValidityDuration = 300; // 5 minutes in seconds
+        const resendEnableTime = 10; // 1 minutes in seconds
+        let timerDisplay = document.getElementById("timer");
+        let resendLink = document.getElementById("resendLink");
+    
+        // Disable the resend link initially
+        resendLink.style.pointerEvents = "none"; 
+    
+        function startTimer() {
+            let timeLeft = otpValidityDuration;
+    
+            const countdown = setInterval(() => {
+                // Convert remaining time into minutes and seconds
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.textContent = `OTP expires in ${minutes}m ${seconds}s`;
+    
+                timeLeft--;
+    
+                // Enable the resend link after 4 minutes (240 seconds)
+                if (timeLeft === otpValidityDuration - resendEnableTime) {
+                    resendLink.style.pointerEvents = "auto"; // Enable the link
+                    resendLink.style.color = "#007bff"; // Optional: Change color to indicate it's active
+                }
+    
+                // When timer hits zero, stop the countdown and display expiration message
+                if (timeLeft < 0) {
+                    clearInterval(countdown);
+                    timerDisplay.textContent = "OTP has expired. Please request a new OTP.";
+                    resendLink.style.pointerEvents = "auto"; // Enable the link if it wasn't already
+                }
+            }, 1000);
+        }
+    
+        // Start timer on page load
+        window.onload = startTimer;
+
+
+        document.getElementById('verifyOTP').addEventListener('submit',async(e)=>{
+            e.preventDefault()
+            const form = e.target
+            const formData = new FormData(form)
+            const data = Object.fromEntries(formData.entries())
+
+            try {
+                Swal.fire({
+                    title: 'Verifying OTP...',
+                    text: 'Please wait while we process your request.',
+                    allowOutsideClick: false, 
+                    allowEscapeKey: false,   
+                    didOpen: () => {
+                        Swal.showLoading(); 
+                    }
+                });
+
+                const response = await fetch('/verify-otp',{
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+
+                const result = await response.json()
+                if(result.success){
+                    Swal.fire({
+                        icon:'success',
+                        title:'Success',
+                        text: result.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(()=>{
+                        window.location.href = '/login'
+                    })
+                } else {
+                    Swal.fire({
+                        icon:'error',
+                        title:'Error',
+                        text: result.message
+                    })
+                }
+            } catch (error) {
+                console.error('Fetch Error:',error)
+                Swal.fire({
+                    icon:'error',
+                    title:'Server Error',
+                    text:'An unexpected error occurred. Please try again'
+                })
+            }
+        })
+
+
+        document.getElementById('resendLink').addEventListener('click', async(e)=>{
+            e.preventDefault()
+
+            try {
+                const form = document.getElementById('resendOTP')
+                const formData = new FormData(form)
+                const data = Object.fromEntries(formData.entries())
+                
+                const response = await fetch('/resend-otp',{
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+
+                const result = await response.json()
+                if(result.success){
+                    Swal.fire({
+                        icon:'success',
+                        title:'Success',
+                        text:result.message
+                    }).then(()=>{
+                        window.location.href = `/verify-otp?email=${encodeURIComponent(data.email)}`;
+                    })
+                } else {
+                    Swal.fire({
+                        icon:'error',
+                        title:'Error',
+                        text: result.message
+                    })
+                }
+            } catch (error) {
+                console.error('Fetch Error:',error)
+                Swal.fire({
+                    icon:'error',
+                    title:'Error',
+                    text:'An unexpected error occurred. Please try again later'
+                })
+            }
+        })
+    </script>
+    
+    
+</body>
+</html>

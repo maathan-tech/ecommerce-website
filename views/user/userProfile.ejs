@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings - HarvestBazar</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --primary-color: #00B207;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+
+        /* Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: white;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            padding: calc(var(--header-height) + 1rem) 1rem 1rem;
+            transition: all 0.3s;
+            z-index: 999;
+            border-right: 1px solid #eee;
+        }
+
+        .sidebar.collapsed {
+            left: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar .nav-link {
+            color: #666;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1001;
+        }
+
+        .main-content {
+            margin-top: 80px;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-upload {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .profile-upload img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .choose-image-btn {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 181, 23, 0.8);
+            color: white;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .choose-image-btn:hover {
+            background: rgba(0, 181, 23, 1);
+        }
+
+       
+
+        @media (max-width: 991px) {
+             .sidebar {
+                left: calc(-1 * var(--sidebar-width));
+            }
+            
+            .sidebar.show {
+                left: 0;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 998;
+            }
+            
+            .overlay.show {
+                display: block;
+            }
+
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-light">
+    <!-- Header -->
+    <header class="header">
+        <button class="btn btn-link sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a class="navbar-brand ms-3" href="/">
+            <img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="40">
+        </a>
+    </header>
+
+    
+    <!-- Sidebar -->
+    <div class="sidebar shadow-sm" id="sidebar">
+        <nav class="nav flex-column">
+            <a href="/userDashboard" class="nav-link">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="/orders" class="nav-link">
+                <i class="fas fa-shopping-basket"></i> Order History
+            </a>
+            <a href="/wishlist" class="nav-link">
+                <i class="fas fa-heart"></i> Wishlist
+            </a>
+            <a href="/shoppingCart" class="nav-link">
+                <i class="fas fa-shopping-cart"></i> Shopping Cart
+            </a>
+            <a href="" class="nav-link active">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+            <a href="/addressbook" class="nav-link">
+                <i class="fas fa-address-book"></i> Address Book
+            </a>
+            <a href="/wallet" class="nav-link">
+                <i class="fas fa-wallet"></i> Wallet
+            </a>
+            <!-- <a href="#" class="nav-link">
+                <i class="fas fa-gift"></i> Referral Bonus
+            </a> -->
+            <a href="/logout" class="nav-link">
+                <i class="fas fa-sign-out-alt"></i> Log-out
+            </a>
+        </nav>
+    </div>
+    
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <div class="main-content">
+        <div class="container-fluid">
+            <h4 class="mb-4">Account Settings</h4>
+            
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- User Profile Display -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <% if (user) { %>
+                                    <div class="me-3">
+                                        <!-- User profile image -->
+                                        <img src="<%= user.profileImage %>" alt="Profile Picture" class="rounded-circle img-fluid " id="profileImage" style="cursor: pointer; width: 250px; height: 200px;">
+                                        
+                                        <!-- Hidden file input -->
+                                        <form id="profileImageForm" action="/uploadProfileImage" method="POST" enctype="multipart/form-data">
+                                            <input type="file" id="profileImageUpload" name="profileImage" style="display: none;" accept="image/*">
+                                        </form>
+                                    </div>
+                                <div>
+                                    <h5><%= user.firstName %> <%=user.lastName %></h5>
+                                    <p class="text-muted mb-1"><%= user.email %></p>
+                                    <p class="text-muted"><%= user.mobile %></p>
+                                </div>
+                                <button class="btn btn-outline-primary ms-auto" id="editProfileBtn">Edit Profile</button>
+                                <% } else { %>
+                                    <p>NO user details available</p>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Edit Profile Form (Initially Hidden) -->
+                    <div class="card mb-4" id="editProfileForm" style="display: none;">
+                        <div class="card-body">
+                            <form id="profileForm">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">First Name</label>
+                                        <input type="text" name="firstName" class="form-control" value="<%= user.firstName %>">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Last Name</label>
+                                        <input type="text" name="lastName" class="form-control" value="<%= user.lastName %>">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" name="mobile" value="<%= user.mobile %>">
+                                </div>
+                                <button type="submit" class="btn btn-success">Save Changes</button>
+                                <button type="button" class="btn btn-secondary ms-2" id="cancelEditProfileBtn">Cancel</button>
+                            </form>
+                        </div>
+                    </div>
+    
+                    <!-- Change Password Display -->
+                    <div class="card">
+                        <div class="card-body d-flex align-items-center">
+                            <h5 class="card-title mb-0">Change Password</h5>
+                            <button class="btn btn-outline-primary ms-auto" id="changePasswordBtn">Change Password</button>
+                        </div>
+                    </div>
+    
+                    <!-- Change Password Form (Initially Hidden) -->
+                    <div class="card mb-4" id="changePasswordForm" style="display: none;">
+                        <div class="card-body">
+                            <form action="/changePassword" method="post" id="changePassword">
+                                <div class="mb-3">
+                                    <label class="form-label">Current Password</label>
+                                    <div class="input-group">
+                                        <input type="password" name="currentPassword" class="form-control">
+                                        <button class="btn btn-outline-secondary" type="button">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">New Password</label>
+                                    <div class="input-group">
+                                        <input type="password" name="newPassword" class="form-control">
+                                        <button class="btn btn-outline-secondary" type="button">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Confirm Password</label>
+                                    <div class="input-group">
+                                        <input type="password" name="confirmPassword" class="form-control">
+                                        <button class="btn btn-outline-secondary" type="button">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-success">Change Password</button>
+                                <button type="button" class="btn btn-secondary ms-2" id="cancelChangePasswordBtn">Cancel</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelector('.sidebar-toggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.main-content').classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 991) {
+                if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                    document.querySelector('.main-content').classList.remove('active');
+                }
+            }
+        });
+
+
+        //toggle edit and change password
+        const editProfileBtn = document.getElementById('editProfileBtn');
+        const editProfileForm = document.getElementById('editProfileForm');
+        const cancelEditProfileBtn = document.getElementById('cancelEditProfileBtn');
+        
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const changePasswordForm = document.getElementById('changePasswordForm');
+        const cancelChangePasswordBtn = document.getElementById('cancelChangePasswordBtn');
+
+        // Toggle Edit Profile Form
+        editProfileBtn.addEventListener('click', () => {
+            editProfileForm.style.display = 'block';
+        });
+
+        cancelEditProfileBtn.addEventListener('click', () => {
+            editProfileForm.style.display = 'none';
+        });
+
+        // Toggle Change Password Form
+        changePasswordBtn.addEventListener('click', () => {
+            changePasswordForm.style.display = 'block';
+        });
+
+        cancelChangePasswordBtn.addEventListener('click', () => {
+            changePasswordForm.style.display = 'none';
+        });
+
+   
+        document.addEventListener('DOMContentLoaded', function() {
+         fetch('/profile')
+            .then(response =>{
+                if(!response.ok){
+                    return response.json().then(data =>{
+                        Swal.fire({
+                            icon:'error',
+                            title:'Oops...',
+                            text: data.message || 'An unexpected error occured!',
+                            confirmButtonText:'OK'
+                        })
+                    })
+                }
+            }).catch(err =>{
+                console.error(err)
+                Swal.fire({
+                    icon:'error',
+                    title:'Internal sever error',
+                    text: 'Something went wrong',
+                    confirmButtonText:'OK'
+                })
+            })
+    });
+
+    //profile imgae
+    document.getElementById('profileImage').addEventListener('click', () => {
+        document.getElementById('profileImageUpload').click();
+    });
+
+ 
+    document.getElementById('profileImageUpload').addEventListener('change', () => {
+     
+
+        const form = document.getElementById('profileImageForm')
+        const formData = new FormData(form)
+
+        Swal.fire({
+            title:'Uploading....',
+            text:'Please wait while your profile picture is being updated.',
+            allowOutsideClick: false,
+            didOpen: ()=>{
+                Swal.showLoading()
+            }
+        })
+
+        fetch('/uploadProfileImage',{
+            method:'POST',
+            body:formData
+        })
+        .then(response => response.json())
+        .then(data =>{
+            Swal.close()
+
+            if(data.success){
+                Swal.fire({
+                    icon:'success',
+                    title:'Success',
+                    text: data.message,
+                    confirmButtonText:'OK'
+                }).then(()=>{
+                    location.reload()
+                })
+            } else {
+                Swal.fire({
+                    icon:'error',
+                    title:'Error',
+                    text: data.message,
+                    confirmButtonText: 'OK'
+                })
+            }
+        }).catch(error =>{
+            console.error('Error:',error)
+            Swal.close()
+            Swal.fire({
+                icon:'error',
+                title:'Error',
+                text:'something went wrong while uploading the image',
+                confirmButtonText:'OK'
+            })
+        })
+    });
+
+
+  
+
+    //Validation
+        document.getElementById('profileForm').addEventListener('submit', async(event) =>{
+        event.preventDefault(); 
+        
+        const firstName = document.querySelector('input[name="firstName"]');
+        const lastName = document.querySelector('input[name="lastName"]');
+        const mobile = document.querySelector('input[name="mobile"]');
+        let isValid = true;
+        let message = "";
+
+        // Trim whitespace from each field
+        firstName.value = firstName.value.trim();
+        lastName.value = lastName.value.trim();
+        mobile.value = mobile.value.trim();
+
+        // Validate First Name
+        if (!firstName.value || firstName.value.length < 1) {
+            isValid = false;
+            message = "First Name is required and must contain at least one character.";
+        }
+        
+        // Validate Last Name
+        else if (!lastName.value || lastName.value.length < 1) {
+            isValid = false;
+            message = "Last Name is required and must contain at least one character.";
+        }
+        
+        // Validate Phone Number (10 digits)
+        else if (!/^[6-9]\d{9}$/.test(mobile.value)) {
+            isValid = false;
+            message = "Phone number should be exactly 10 digits and start from 6-9.";
+        }
+
+        if (!isValid) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: message,
+                confirmButtonText: 'OK'
+            });
+            return 
+        } 
+           
+        const formData = new FormData(event.target)
+        const result = Object.fromEntries(formData.entries())
+
+        try {
+            const response = await fetch('/profile',{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify(result)
+            })
+            const data = await response.json()
+            if(data.success){
+                Swal.fire({
+                    icon:'success',
+                    title:'Success',
+                    text: data.message,
+                    confirmButtonText:'OK'
+                }).then(()=>{
+                    location.reload()
+                })
+            } else {
+                Swal.fire({
+                    icon:'error',
+                    title:'Profile Updation Error',
+                    text: data.message,
+                    confirmButtonText:'OK'
+                })
+            }
+        } catch (error) {
+            console.error(error)
+            Swal.fire({
+                icon:'error',
+                title:'Internal sever error',
+                text:'Something went wrong',
+                confirmButtonText:'OK'
+            })
+            
+        }
+        
+    });
+
+    //change password validation
+
+        document.getElementById('changePassword').addEventListener('submit', async(event)=> {
+        event.preventDefault(); 
+        
+        const currentPassword = document.querySelector('input[name="currentPassword"]');
+        const newPassword = document.querySelector('input[name="newPassword"]');
+        const confirmPassword = document.querySelector('input[name="confirmPassword"]');
+        let isValid = true;
+        let message = "";
+
+      
+        if (!currentPassword.value.trim()) {
+            isValid = false;
+            message = "Current Password is required.";
+        }
+        
+        else if (newPassword.value.trim().length < 6) {
+            isValid = false;
+            message = "New Password should be at least 6 characters.";
+        }
+       
+        else if (newPassword.value.trim() !== confirmPassword.value.trim()) {
+            isValid = false;
+            message = "Confirm Password must match the New Password.";
+        }
+
+        if (!isValid) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: message,
+                confirmButtonText: 'OK'
+            });
+            return 
+        } 
+
+        const formData = new FormData(event.target)
+        const result = Object.fromEntries(formData.entries())
+
+        try {
+            const response = await fetch('/changePassword',{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify(result)
+            })
+
+            const data = await response.json()
+            if(data.success){
+                Swal.fire({
+                    icon:'success',
+                    title:'Success',
+                    text: data.message,
+                    confirmButtonText:'OK'
+                }).then(()=>{
+                    location.reload()
+                })
+            } else {
+                Swal.fire({
+                    icon:'error',
+                    title:'Password Error',
+                    text: data.message,
+                    confirmButtonText:'OK'
+                })
+            }
+        } catch (error) {
+            console.error(error)
+            Swal.fire({
+                icon:'error',
+                title:'Internal server error',
+                text:'Something went wrong!',
+                confirmButtonText:'OK'
+            })
+        }
+    });
+
+    // Toggle password visibility
+    document.querySelectorAll('.input-group button').forEach(button => {
+        button.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            if (input.type === "password") {
+                input.type = "text";
+                this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                input.type = "password";
+                this.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        });
+    });
+    </script> 
+</body>
+</html>

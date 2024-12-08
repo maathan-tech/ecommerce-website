@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Address</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Edit Address</h1>
+        <form id="editAddressForm">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="editFirstName" class="form-label">First Name</label>
+                    <input type="text" name="firstName" id="editFirstName" class="form-control" value="<%= address.firstName %>" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="editLastName" class="form-label">Last Name</label>
+                    <input type="text" name="lastName" id="editLastName" class="form-control" value="<%= address.lastName %>" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="editStreet" class="form-label">Street Address</label>
+                <input type="text" name="street" id="editStreet" class="form-control" value="<%= address.street %>" required>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="editCity" class="form-label">City</label>
+                    <input type="text" name="city" id="editCity" class="form-control" value="<%= address.city %>" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="editState" class="form-label">State</label>
+                    <input type="text" name="state" id="editState" class="form-control" value="<%= address.state %>" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="editZipCode" class="form-label">Zip Code</label>
+                    <input type="text" name="zipcode" id="editZipCode" class="form-control" value="<%= address.zipcode %>" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="editCountry" class="form-label">Country</label>
+                    <input type="text" name="country" id="editCountry" class="form-control" value="<%= address.country %>" required>
+                </div>
+           
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="editPhone" class="form-label">Phone</label>
+                    <input type="tel" name="mobile" id="editPhone" class="form-control" value="<%= address.mobile %>" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Address</button>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', ()=> {
+            const addressId = window.location.pathname.split('/')[2]
+           fetch(`/addressbook/${addressId}/edit`)
+                    .then(response =>{
+                        if(!response.ok){
+                            return response.json().then(data =>{
+                                Swal.fire({
+                                    icon:'error',
+                                    title:'Oops...',
+                                    text: data.message || 'An unexpected error occured!',
+                                    confirmButtonText:'OK'
+                                })
+                            })
+                        }
+                    }).catch(err =>{
+                        Swal.fire({
+                            icon:'error',
+                            title:'Internal server Error',
+                            text:'Something error occured!',
+                            confirmButtonText:'OK'
+                        })
+                    })
+        });
+
+
+        document.getElementById('editAddressForm').addEventListener('submit',async(e)=>{
+            e.preventDefault()
+
+            const addressId = window.location.pathname.split('/')[2]
+            const formData = new FormData(e.target)
+            const result = Object.fromEntries(formData.entries())
+
+
+            const { errors: validationErrors , trimmedAddress } = validateAddress(result);
+            if (validationErrors.length > 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: validationErrors.join(', '),
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            try {
+                const response = await fetch(`/addressbook/${addressId}/edit`,{
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                    body: JSON.stringify(result)
+                })
+                const data = await response.json()
+                if(data.success){
+                    Swal.fire({
+                        icon:'success',
+                        title:'Success',
+                        text: data.message ,
+                        confirmButtonText: 'OK'
+                    }).then(()=>{
+                        window.location.href = '/addressbook'
+                    })
+                } else {
+                    Swal.fire({
+                        icon:'error',
+                        title:'Updating error',
+                        text:data.message,
+                        confirmButtonText:'OK'
+                    })
+                }
+            } catch (error) {
+                console.error(error)
+                Swal.fire({
+                    icon:'error',
+                    title:'Internal sever error',
+                    text:'Something error occured!',
+                    confirmButtonText:'OK'
+                })
+            }
+        })
+
+
+
+        function validateAddress(address) {
+        const errors = [];
+        const trimmedAddress = {};
+
+        for (const key in address) {
+            trimmedAddress[key] = address[key].trim();
+        }
+
+       
+        for (const key in trimmedAddress) {
+            if (!trimmedAddress[key]) {
+                errors.push(`${key} is required`);
+            }
+        }
+
+        
+        for (const key in trimmedAddress) {
+            if (key !== 'mobile' && key !== 'zipcode' && key !== 'lastName' && trimmedAddress[key].length < 3) {
+                errors.push(`${key} must be at least 3 characters long`);
+            }
+        }
+
+        if (trimmedAddress.zipcode && !/^\d{6}$/.test(trimmedAddress.zipcode)) {
+            errors.push('Zip Code should be exactly 6 digits');
+        }
+
+       
+        if (trimmedAddress.mobile && !/^[6-9]\d{9}$/.test(trimmedAddress.mobile)) {
+            errors.push('Mobile number should contains 10 digits and start inbetween 6-9 digits');
+        }
+
+       
+        if (trimmedAddress.firstName && !/^[a-zA-Z\s]+$/.test(trimmedAddress.firstName)) {
+            errors.push('First name should only contain letters');
+        }
+        if (trimmedAddress.lastName && !/^[a-zA-Z\s]+$/.test(trimmedAddress.lastName)) {
+            errors.push('Last name should only contain letters');
+        }
+        if(trimmedAddress.state && !/^[a-zA-Z\s]+$/.test(trimmedAddress.state)){
+            errors.push('State name contains only letters')
+        }
+        if(trimmedAddress.country && !/^[a-zA-Z\s]+$/.test(trimmedAddress.country)){
+            errors.push('Country name should contains only letters')
+        }
+
+        return { errors, trimmedAddress };
+    }
+
+    </script>
+</body>
+</html>

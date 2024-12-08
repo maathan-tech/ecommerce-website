@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History - HarvestBazar</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+         :root {
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --primary-color: #00B207;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+
+        /* Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: white;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            padding: calc(var(--header-height) + 1rem) 1rem 1rem;
+            transition: all 0.3s;
+            z-index: 999;
+            border-right: 1px solid #eee;
+        }
+
+        .sidebar.collapsed {
+            left: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar .nav-link {
+            color: #666;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1001;
+        }
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: 0.3s all;
+        }
+
+        /* Order History Table */
+        .order-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .order-table th {
+            background: #f8f9fa;
+            font-weight: 500;
+            padding: 1rem;
+        }
+
+        .order-table td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status-pending {
+            background-color: orange; /* Pending orders */
+        }
+
+        .status-processing {
+            background-color: yellow; /* Paid orders that are being processed */
+        }
+
+        .status-shipped {
+            background-color: yellowgreen; /* Shipped orders */
+        }
+
+        .status-delivered {
+            background-color: green; /* Delivered orders */
+        }
+
+        .status-cancelled {
+            background-color: red; /* Cancelled orders */
+        }
+        .status-returned {
+            background-color: rgb(255, 85, 0); /* Cancelled orders */
+        }
+         
+                .btn-view {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .btn-view:hover {
+            text-decoration: underline;
+            color: var(--primary-color);
+        }
+
+        /* Pagination */
+        .pagination {
+            margin-top: 2rem;
+        }
+
+        .pagination .page-link {
+            border: none;
+            padding: 0.5rem 1rem;
+            color: #666;
+            margin: 0 0.25rem;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 5px;
+        }
+
+        
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 991px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 998;
+            }
+            
+            .overlay.show {
+                display: block;
+            }
+
+            /* Responsive table */
+            .order-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .status-badge {
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Header -->
+    <header class="header">
+        <button class="btn btn-link sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a class="navbar-brand ms-3" href="/">
+            <img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="40">
+        </a>
+    </header>
+    
+    <!-- Sidebar -->
+    <div class="sidebar shadow-sm" id="sidebar">
+        <nav class="nav flex-column">
+            <a href="/userDashboard" class="nav-link">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="" class="nav-link active">
+                <i class="fas fa-shopping-basket"></i> Order History
+            </a>
+            <a href="/wishlist" class="nav-link">
+                <i class="fas fa-heart"></i> Wishlist
+            </a>
+            <a href="/shoppingCart" class="nav-link">
+                <i class="fas fa-shopping-cart"></i> Shopping Cart
+            </a>
+            <a href="/profile" class="nav-link">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+            <a href="/addressbook" class="nav-link">
+                <i class="fas fa-address-book"></i> Address Book
+            </a>
+            <a href="/wallet" class="nav-link">
+                <i class="fas fa-wallet"></i> Wallet
+            </a>
+            <!-- <a href="#" class="nav-link">
+                <i class="fas fa-gift"></i> Referral Bonus
+            </a> -->
+            <a href="/logout" class="nav-link">
+                <i class="fas fa-sign-out-alt"></i> Log-out
+            </a>
+        </nav>
+    </div>
+    
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h4 class="mb-4">Order History</h4>
+            
+            <div class="table-responsive order-table">
+                <table class="table table-borderless mb-0">
+                  <thead>
+                    <tr>
+                      <th>ORDER ID</th>
+                      <th>DATE</th>
+                      <th>TOTAL</th>
+                      <th>QUANTITY</th>
+                      <th>STATUS</th>
+                      <th>ACTION</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if(orders.length === 0){ %>
+                        <tr><td colspan="6" style="text-align: center;">No orders found</td></tr>
+                    <% } else { %>
+                        <% orders.forEach(order => { %>
+                        <tr>
+                            <td><%= order._id %></td>
+                            <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                            <td>₹<%= (typeof order.totalAmount === 'number' && !isNaN(order.totalAmount)) ? order.totalAmount.toFixed(2) : '0.00' %></td>
+                            <td><%= (typeof order.totalQuantity === 'number' && !isNaN(order.totalQuantity)) ? order.totalQuantity : '0' %></td>
+                            <td>
+                                <span class="status-badge 
+                                <%= order.status === 'pending' ? 'status-pending' : '' %>
+                                <%= order.status === 'paid' ? 'status-processing' : '' %>
+                                <%= order.status === 'shipped' ? 'status-shipped' : '' %>
+                                <%= order.status === 'Delivered' ? 'status-delivered' : '' %>
+                                <%= order.status === 'Cancelled' ? 'status-cancelled' : '' %>
+                                <%= order.status === 'Returned' ? 'status-returned' : '' %>">
+                                <%= order.status %>
+                            </span>
+                            </td>
+                            <td><a href="/orders/orderDetails/<%= order._id %>" class="btn-view">View Details</a></td>
+                        </tr>
+                        <% }) %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation" class="d-flex justify-content-center">
+                <ul class="pagination">
+                  <!-- Previous Button -->
+                  <% if (currentPage > 1) { %>
+                    <li class="page-item">
+                      <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                        <i class="fas fa-chevron-left"></i>
+                      </a>
+                    </li>
+                  <% } else { %>
+                    <li class="page-item disabled">
+                      <a class="page-link" href="#" aria-label="Previous">
+                        <i class="fas fa-chevron-left"></i>
+                      </a>
+                    </li>
+                  <% } %>
+              
+                  <!-- Page Numbers -->
+                  <% for (let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                      <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>
+                  <% } %>
+              
+                  <!-- Next Button -->
+                  <% if (currentPage < totalPages) { %>
+                    <li class="page-item">
+                      <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                        <i class="fas fa-chevron-right"></i>
+                      </a>
+                    </li>
+                  <% } else { %>
+                    <li class="page-item disabled">
+                      <a class="page-link" href="#" aria-label="Next">
+                        <i class="fas fa-chevron-right"></i>
+                      </a>
+                    </li>
+                  <% } %>
+                </ul>
+              </nav>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sidebar Toggle Functionality
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        }
+
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        // Close sidebar on window resize if screen becomes large
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 992) {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded',()=>{
+            fetch('/orders')
+                .then(response =>{
+                    if(!response.ok){
+                        return response.json().then(data =>{
+                            Swal.fire({
+                                icon:'error',
+                                title:'Oops...',
+                                text:data.message || 'An unexpected error occured!',
+                                confirmButtonText: 'OK'
+                            })
+                        })
+                    }
+                }).catch(err =>{
+                    Swal.fire({
+                        icon:'error',
+                        title:'Network error',
+                        text:'Check your connection and try again',
+                        confirmButtonText:'OK'
+                    })
+                })
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarvestBazar Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .logo-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            padding: 15px;
+            background: white;
+            z-index: 1030;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: -250px;
+            width: 250px;
+            height: calc(100vh - 60px);
+            background: #fff;
+            transition: 0.3s;
+            z-index: 1020;
+            overflow-y: auto;
+            border-right: 1px solid #eee;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .nav-link {
+            color: #666;
+            padding: 10px 20px;
+        }
+
+        .nav-link:hover {
+            background-color: #f8f9fa;
+        }
+
+        .nav-link.active {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .main-content {
+            margin-left: 0;
+            transition: 0.3s;
+            padding-top: 60px;
+        }
+
+        .main-content.active {
+            margin-left: 250px;
+        }
+
+        .toggle-btn {
+            position: fixed;
+            top: 15px;
+            left: 260px;
+            z-index: 1040;
+            transition: 0.3s;
+            display: none;
+        }
+
+        .toggle-btn.active {
+            left: 260px;
+        }
+
+        .mobile-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1040;
+            display: none;
+        }
+        @media (min-width: 992px) {
+            .sidebar {
+                left: 0;
+            }
+            .main-content {
+                margin-left: 250px;
+            }
+            .toggle-btn {
+                display: none;
+            }
+            .mobile-toggle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 991px) {
+            .logo-container {
+                left: -250px;
+            }
+            .logo-container.active {
+                left: 0;
+            }
+            .mobile-toggle {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* .stats-card {
+            border-radius: 10px;
+            padding: 20px;
+        } */
+
+        /* .pink-bg { background-color: #ffebee; }
+        .orange-bg { background-color: #fff3e0; }
+        .green-bg { background-color: #e8f5e9; }
+        .purple-bg { background-color: #f3e5f5; }
+
+        .chart-container, .products-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .progress {
+            height: 8px;
+        } */
+
+        body {
+            background-color: #f4f6f9;
+        }
+        .dashboard-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .filter-section {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .top-products-table {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        #orderStatusChart{
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="logo-container">
+        <a class="navbar-brand " href="#"><img src="/images/HarvestBazar1.png" alt="HarvestBazar" height="50" > </a>
+    </div>
+
+    <!-- Mobile Toggle Button -->
+    <button class="btn btn-light mobile-toggle" id="mobileToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Desktop Toggle Button -->
+    <button class="btn btn-light toggle-btn" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar mt-3" id="sidebar">
+        <nav class="nav flex-column">
+            <a class="nav-link active" href=""><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+            <a class="nav-link" href="/admin/orders"><i class="fas fa-shopping-cart me-2"></i> Orders</a>
+            <a class="nav-link" href="/admin/productcategories"><i class="fas fa-list me-2"></i> Product Categories</a>
+            <a class="nav-link" href="/admin/products"><i class='fas fa-bookmark me-2'></i> Products</a>
+            <a class="nav-link" href="/admin/usermanagement"><i class="fas fa-users me-2"></i> User Management</a>
+            <!-- <a class="nav-link" href="#"><i class="fas fa-chart-bar me-2"></i> Sales Report</a> -->
+            <a class="nav-link" href="/admin/coupons"><i class="fas fa-ticket-alt me-2"></i> Coupons</a>
+            <a class="nav-link" href="/admin/offers"><i class="fa-solid fa-gift me-2"></i> Offers</a>
+            <a class="nav-link" href="/admin/logout"><i class="fas fa-sign-out-alt me-2"></i> Log-out</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="main">
+        <div class="container-fluid px-4 py-4">
+            <h1 class="mb-4">Sales Dashboard</h1>
+            
+            <!-- Filter Section -->
+            <div class="row filter-section">
+                <div class="col-md-3">
+                    <label class="form-label">Date Range</label>
+                    <select class="form-select" id="dateRangeSelect">
+                        <option value="daily" selected>Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="startDate">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">End Date</label>
+                    <input type="date" class="form-control" id="endDate">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <div>
+                        <button class="btn btn-primary me-2" id="applyFilter">Apply Filter</button>
+                        <button class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">Export</button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" id="exportExcel">Export to Excel</a></li>
+                            <li><a class="dropdown-item" href="#" id="exportPDF">Export to PDF</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Dashboard Cards -->
+            <div class="row">
+                <!-- Sales Overview Chart -->
+                <div class="col-md-8">
+                    <div class="card dashboard-card">
+                        <div class="card-header">
+                            Sales Overview
+                        </div>
+                        <div class="card-body chart-container">
+                            <canvas id="salesOverviewChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Key Metrics -->
+                <div class="col-md-4">
+                    <div class="card dashboard-card h-100">
+                        <div class="card-header">
+                            Key Metrics
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <small class="text-muted">Total Sales</small>
+                                    <h5 id="totalSales"></h5>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <small class="text-muted">Total Orders</small>
+                                    <h5 id="totalOrders"></h5>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <small class="text-muted">Avg. Order Value</small>
+                                    <h5 id="avgOrderValue"></h5>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <small class="text-muted">Total Discount</small>
+                                    <h5 id="totalDiscount"></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Order Status and Top Products -->
+            <div class="row">
+                <!-- Order Status Chart -->
+                <div class="col-md-8">
+                    <div class="card dashboard-card">
+                        <div class="card-header">
+                            Order Status
+                        </div>
+                        <div class="card-body chart-container " style="height: 500px; width: 500px; " >
+                            <canvas  id="orderStatusChart" height="100" width="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Top Products -->
+                <div class="col-md-4">
+                    <div class="card dashboard-card">
+                        <div class="card-header">
+                            Top Selling Products
+                        </div>
+                        <div class="card-body top-products-table">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th class="text-end">Units Sold</th>
+                                        <th class="text-end">Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="topProductsBody">
+                                    <!-- <tr>
+                                        <td>Laptop Pro</td>
+                                        <td class="text-end">250</td>
+                                        <td class="text-end">₹375,000</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Smartphone Max</td>
+                                        <td class="text-end">180</td>
+                                        <td class="text-end">₹270,000</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Wireless Earbuds</td>
+                                        <td class="text-end">120</td>
+                                        <td class="text-end">₹180,000</td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+
+       
+    
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script>
+        // Sidebar Toggle Functionality
+        const sidebar = document.getElementById('sidebar');
+        const main = document.getElementById('main');
+        const logo = document.querySelector('.logo-container');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const mobileToggle = document.getElementById('mobileToggle');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            main.classList.toggle('active');
+            logo.classList.toggle('active');
+            toggleBtn.classList.toggle('active');
+        }
+
+        toggleBtn.addEventListener('click', toggleSidebar);
+        mobileToggle.addEventListener('click', toggleSidebar);
+
+
+        //excel and pdf export
+        document.getElementById('exportExcel').addEventListener('click', (event) => {
+            event.preventDefault()
+            Swal.fire({
+                icon:'success',
+                title:'Exporting....',
+                text:'Exporting to excel....'
+            })
+            
+            exportReport('excel')
+        });
+
+        document.getElementById('exportPDF').addEventListener('click', (event) => {
+           event.preventDefault()
+           Swal.fire({
+                icon:'success',
+                title:'Exporting....',
+                text:'Exporting to PDF....'
+            })
+           exportReport('pdf')
+        });
+
+        function exportReport(type){
+            const dateRange = document.getElementById('dateRangeSelect').value
+            const startDate = document.getElementById('startDate').value
+            const endDate = document.getElementById('endDate').value
+
+            if(dateRange === 'custom' && (!startDate || !endDate)){
+                Swal.fire({
+                    icon:'warning',
+                    title:'Warning',
+                    text:'Complete start or end date'
+                })
+                return
+            }
+
+            const queryParams = new URLSearchParams({
+                dateRange,
+                startDate: startDate || '',
+                endDate: endDate || ''
+            })
+            window.location.href = `/admin/sales-report/export/${type}?${queryParams}`;
+        }
+            
+
+        // Sales Overview Chart
+        const salesCtx = document.getElementById('salesOverviewChart').getContext('2d');
+        const salesChart = new Chart(salesCtx, {
+            type: 'line',
+            data: {
+                labels: [], // Months
+                datasets: [
+                    {
+                        label: 'Total Sales',
+                        data: [], // Sales data
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)', // Optional fill color
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Discounts',
+                        data: [], // Discounts data
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)', // Optional fill color
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    },
+                    tooltip: {
+                        enabled: true
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Months'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Amount (₹)'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Order Status Chart
+        const orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+        const statusChart = new Chart(orderStatusCtx, {
+            type: 'pie',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Order Status Breakdown',
+                        data: [],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(105, 20, 186, 0.6)',
+                            'rgba(65, 26, 86, 0.6)',
+                            'rgba(0, 206, 6, 0.6)',
+                        ]
+                    },
+                   
+                ]
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded',async ()=>{
+            await fetchAndDisplayReport('daily')
+
+            fetch('/admin/dashboard')
+                .then(response =>{
+                    if(!response.ok){
+                        return response.json().then(data =>{
+                            Swal.fire({
+                                icon:'error',
+                                title:'Oops...',
+                                text: data.message || 'An unexpected error occured!',
+                                confirmButtonText:'OK'
+                            })
+                        })
+                    }
+                }).catch(err =>{
+                    Swal.fire({
+                        icon:'error',
+                        title:'Internal Server error',
+                        text:'Something went wrong',
+                        confirmButtonText:'OK'
+                    })
+                })
+        })
+
+
+
+        // Date range filter logic
+        document.getElementById('applyFilter').addEventListener('click', async() => {
+            const dateRange = document.getElementById('dateRangeSelect').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+
+            if(dateRange === 'custom'){
+                if(!startDate || !endDate){
+                    Swal.fire({
+                        icon:'warning',
+                        title:'WARNING',
+                        text:'Choose start and end date',
+                    })
+                    return
+                }
+            }
+
+            console.log('Filter Applied:', {
+                range: dateRange,
+                start: startDate,
+                end: endDate
+            });
+
+            await fetchAndDisplayReport(dateRange, startDate, endDate)
+            
+            
+        });
+
+
+        async function fetchAndDisplayReport(dateRange, startDate = '', endDate = ''){
+            try {
+                const response = await fetch(`/admin/sales-report?dateRange=${dateRange}&startDate=${startDate}&endDate=${endDate}`)
+                if(!response.ok){
+                    throw new Error(`Server error: ${response.status}`)
+                }
+                const data = await response.json()
+
+                updateSalesOverviewChart(data.salesByMonthData)
+                updateOrderStatusChart(data.orderStatusBreakDown)
+                updateKeyMetrics(data)
+                updateTopProductsTable(data.topProducts)
+
+            } catch (error) {
+                console.error('Error fetching sales report:',error)
+                Swal.fire({
+                    icon:'error',
+                    title:'ERROR',
+                    text:error
+                })
+                
+            }
+        }
+
+        function updateSalesOverviewChart(salesByMonthData) {
+            // Extract months, sales, and discounts from the backend response
+            const labels = salesByMonthData.map(data => data.month);
+            const salesData = salesByMonthData.map(data => data.sales);
+            const discountsData = salesByMonthData.map(data => data.discount);
+
+            // Update the chart data
+            salesChart.data.labels = labels;
+            salesChart.data.datasets[0].data = salesData;
+            salesChart.data.datasets[1].data = discountsData;
+            salesChart.update();
+        }
+
+        function updateOrderStatusChart(orderStatusBreakDown){
+            const labels = Object.keys(orderStatusBreakDown)
+            const data = Object.values(orderStatusBreakDown)
+
+            statusChart.data.labels = labels
+            statusChart.data.datasets[0].data = data
+            statusChart.update()
+        }
+
+        function updateKeyMetrics(data){
+            document.getElementById('totalSales').textContent = `₹${data.totalSales.toFixed(2)}`;
+            document.getElementById('totalOrders').textContent = data.totalOrders;
+            document.getElementById('avgOrderValue').textContent = `₹${data.avgOrderValue.toFixed(2)}`;
+            document.getElementById('totalDiscount').textContent = `₹${data.totalDiscount.toFixed(2)}`;
+        }
+
+        function updateTopProductsTable(products){
+            const tableBody = document.getElementById('topProductsBody')
+            tableBody.innerHTML = ''
+            products.forEach(product =>{
+                const row = `
+                    <tr>
+                        <td>${product.name}</td>
+                        <td class="text-end">${product.units}</td>
+                        <td class="text-end">₹${product.revenue.toFixed(2)}</td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend',row)
+            })
+        }
+    </script>
+</body>
+</html>

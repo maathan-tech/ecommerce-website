@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .error-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        .error-number {
+            font-size: 150px;
+            font-weight: bold;
+            color: #198754;
+            text-shadow: 4px 4px 0 #e9ecef;
+            line-height: 1;
+        }
+        .error-image {
+            max-width: 400px;
+            margin: 2rem auto;
+        }
+        .error-msg {
+            color: #495057;
+            font-size: 1.5rem;
+        }
+        .back-home {
+            background-color: #198754;
+            border-color: #198754;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+        }
+        .back-home:hover {
+            background-color: #146c43;
+            border-color: #146c43;
+        }
+        .leaves {
+            position: absolute;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        .leaf-1 {
+            top: 10%;
+            left: 10%;
+            transform: rotate(45deg);
+        }
+        .leaf-2 {
+            bottom: 20%;
+            right: 15%;
+            transform: rotate(-65deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="error-page d-flex align-items-center position-relative overflow-hidden">
+        <!-- Decorative leaves -->
+        <svg class="leaves leaf-1" width="100" height="100" viewBox="0 0 24 24">
+            <path fill="#198754" d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.75,17.25 3.75,17.25C7,8 17,8 17,8Z"/>
+        </svg>
+        <svg class="leaves leaf-2" width="120" height="120" viewBox="0 0 24 24">
+            <path fill="#198754" d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.75,17.25 3.75,17.25C7,8 17,8 17,8Z"/>
+        </svg>
+
+        <div class="container text-center position-relative">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <!-- <div class="error-number mb-4">404</div> -->
+                    <div class="error-image">
+                        <!-- Placeholder image for demonstration -->
+                        <img src="/images/404.png" alt="404 illustration" class="img-fluid">
+                    </div>
+                    <h1 class="error-msg mb-4">Oops! Page Not Found</h1>
+                    <p class="lead mb-5">We couldn't find the page you're looking for. It might have been removed, renamed, or doesn't exist.</p>
+                    <a href="/" class="btn btn-primary back-home">
+                        Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
