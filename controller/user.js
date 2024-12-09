@@ -177,6 +177,9 @@ exports.requestPasswordReset = async(req,res)=>{
         if(!user){
             return res.status(404).json({ success:false, message: "User with this email doesn't exist." });
         }
+        if(user.isBlocked){
+            return res.status(400).json({ success: false, message:'User is blocked, Kindly contact support'})
+        }
 
         //Generate a token
         const token = generateToken({ userId:user._id })
