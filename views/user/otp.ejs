@@ -130,7 +130,7 @@
             color: var(--primary-green);
         }
 
-        /* Responsive Adjustments */
+        
         @media (max-width: 768px) {
             .otp-card {
                 margin: 0 15px;
@@ -170,7 +170,7 @@
                     <div class="mb-4">
                         <label class="form-label">Enter Confirmation Code</label>
                         <span id="timer" style="margin-left: 10px; color: #888;"></span>
-                        <input type="hidden" name="email" value="<%= email %>"> <!-- Pass the email -->
+                        <input type="hidden" name="email" value="<%= email %>"> 
                         <input type="text" name="otp" class="form-control" placeholder="Confirmation Code" required>
                     </div>
                     <button type="submit" class="verify-btn">Verify Now</button>
@@ -178,7 +178,7 @@
 
                 <!-- Resend OTP form -->
                 <form  class="resend-text" style="display:inline;" id="resendOTP">
-                    <input type="hidden" name="email" value="<%= email %>"> <!-- Pass the email -->
+                    <input type="hidden" name="email" value="<%= email %>"> 
                     
                     Don't receive OTP?<a href="#"  id="resendLink"  class="resend-link"> Resend Now</a>
                     
@@ -289,37 +289,37 @@
                 }
             })
 
-        // Timer variables
-        const otpValidityDuration = 300; // 5 minutes in seconds
-        const resendEnableTime = 10; // 1 minutes in seconds
+        
+        const otpValidityDuration = 300;
+        const resendEnableTime = 10;
         let timerDisplay = document.getElementById("timer");
         let resendLink = document.getElementById("resendLink");
     
-        // Disable the resend link initially
+    
         resendLink.style.pointerEvents = "none"; 
     
         function startTimer() {
             let timeLeft = otpValidityDuration;
     
             const countdown = setInterval(() => {
-                // Convert remaining time into minutes and seconds
+                
                 const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
                 timerDisplay.textContent = `OTP expires in ${minutes}m ${seconds}s`;
     
                 timeLeft--;
     
-                // Enable the resend link after 4 minutes (240 seconds)
+                
                 if (timeLeft === otpValidityDuration - resendEnableTime) {
-                    resendLink.style.pointerEvents = "auto"; // Enable the link
-                    resendLink.style.color = "#007bff"; // Optional: Change color to indicate it's active
+                    resendLink.style.pointerEvents = "auto"; 
+                    resendLink.style.color = "#007bff"; 
                 }
     
-                // When timer hits zero, stop the countdown and display expiration message
+               
                 if (timeLeft < 0) {
                     clearInterval(countdown);
                     timerDisplay.textContent = "OTP has expired. Please request a new OTP.";
-                    resendLink.style.pointerEvents = "auto"; // Enable the link if it wasn't already
+                    resendLink.style.pointerEvents = "auto"; 
                 }
             }, 1000);
         }

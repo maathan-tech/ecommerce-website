@@ -80,16 +80,6 @@ router.post('/offers/edit',authMiddleware.isAdminLogged,adminController.editOffe
 router.delete('/offers/delete/:offerId',authMiddleware.isAdminLogged,adminController.deleteOffer)
 
 
-router.get('/offer', async (req, res) => {
-    try {
-        const offers = await Offer.find({ type: 'category', isActive: true });
-        res.json(offers); 
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: "Internal Server Error" });
-    }
-});
-
 router.post('/applyOfferToCategory',authMiddleware.isAdminLogged,adminController.applyOffertoCategory)
 router.post('/applyOfferToProducts',authMiddleware.isAdminLogged, adminController.applyOffertoProducts)
 //logout

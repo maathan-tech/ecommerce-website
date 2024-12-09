@@ -19,7 +19,6 @@
             margin: 0;
         }
 
-        /* Header Styles */
         .header {
             position: fixed;
             top: 0;
@@ -34,7 +33,7 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Sidebar Styles */
+        
         .sidebar {
             width: var(--sidebar-width);
             background: white;
@@ -143,7 +142,7 @@
                 display: block;
             }
 
-            /* Responsive table */
+            
             .order-table {
                 display: block;
                 overflow-x: auto;
@@ -200,7 +199,6 @@
         </nav>
     </div>
 
-    <!-- Overlay for mobile -->
     <div class="overlay" id="overlay"></div>
 
     <!-- Main Content -->
@@ -234,7 +232,7 @@
                                     <% if (transcationHistory && transcationHistory.length > 0) { %>
                                         <% transcationHistory.forEach((transaction, index) => { %>
                                             <tr>
-                                                <td><%= transaction.description %></td> <!-- Transaction ID placeholder -->
+                                                <td><%= transaction.description %></td> 
                                                 <td><%= transaction.createdAt %></td>
                                                 <td class="<%= transaction.status === 'credit' ? 'status-credit' : 'status-debit' %>">
                                                     <%= transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1) %>
@@ -292,7 +290,7 @@
         sidebarToggle.addEventListener('click', toggleSidebar);
         overlay.addEventListener('click', toggleSidebar);
 
-        // Close sidebar on window resize if screen becomes large
+        
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 992) {
                 sidebar.classList.remove('show');

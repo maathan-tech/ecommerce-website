@@ -35,11 +35,11 @@ const offerSchema = new mongoose.Schema({
 offerSchema.statics.deactivateExpiredOffers = async function () {
     const now = new Date();
     try {
-        // Find all expired and active offers
+        
         const expiredOffers = await this.find({ endDate: { $lt: now }, isActive: true });
 
         console.log('expired offer:',expiredOffers)
-        // Loop through each expired offer and deactivate it
+        
         for (const offer of expiredOffers) {
             await offer.deactivateOffer();
         }

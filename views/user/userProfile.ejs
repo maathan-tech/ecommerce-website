@@ -237,7 +237,7 @@
                         </div>
                     </div>
     
-                    <!-- Edit Profile Form (Initially Hidden) -->
+                    <!-- Edit Profile Form  -->
                     <div class="card mb-4" id="editProfileForm" style="display: none;">
                         <div class="card-body">
                             <form id="profileForm">
@@ -270,7 +270,7 @@
                         </div>
                     </div>
     
-                    <!-- Change Password Form (Initially Hidden) -->
+                    <!-- Change Password Form -->
                     <div class="card mb-4" id="changePasswordForm" style="display: none;">
                         <div class="card-body">
                             <form action="/changePassword" method="post" id="changePassword">
@@ -319,7 +319,7 @@
             document.querySelector('.main-content').classList.toggle('active');
         });
 
-        // Close sidebar when clicking outside on mobile
+        // Close sidebar 
         document.addEventListener('click', function(event) {
             const sidebar = document.querySelector('.sidebar');
             const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -456,7 +456,7 @@
         let isValid = true;
         let message = "";
 
-        // Trim whitespace from each field
+        // Trim whitespace 
         firstName.value = firstName.value.trim();
         lastName.value = lastName.value.trim();
         mobile.value = mobile.value.trim();

@@ -139,7 +139,7 @@ exports.resendOtp = async (req, res) => {
             return res.status(400).json({ success:false, message:'Your account already verified'})
         }
 
-        // Generate a new OTP and update it in the user document
+        // Generate a new OTP
         const otp = generateOTP();
         const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
 
@@ -178,7 +178,7 @@ exports.requestPasswordReset = async(req,res)=>{
             return res.status(404).json({ success:false, message: "User with this email doesn't exist." });
         }
 
-        //Generate a token and save to user
+        //Generate a token
         const token = generateToken({ userId:user._id })
         user.resetPasswordToken = token;
         user.resetPasswordExpires = Date.now() + 3600000;
@@ -231,7 +231,7 @@ exports.resetPassword = async(req,res)=>{
  
         }
 
-        //save new password and clear token fields
+        //save new password 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedPassword;
         user.resetPasswordToken = undefined;
@@ -431,7 +431,7 @@ exports.showOrderdetails = async(req,res)=>{
         const totalQuantity = order.items.reduce((total, item) => total + item.quantity, 0);
         const totalAmount = order.totalPriceAfterDiscount
       
-            // Return the order object with added totalQuantity and totalAmount
+            
             return { 
               ...order.toObject(), 
               totalQuantity, 
@@ -482,7 +482,6 @@ exports.cancelOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
 
-        // Find the order and check if it can be cancelled
         const order = await Order.findById(orderId).populate('items.product');
         
         if (!order) {
@@ -493,12 +492,12 @@ exports.cancelOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: "Order already cancelled or deliverd the product" });
         }
 
-        // Update the order status to "Cancelled"
+        // Update the order status "Cancelled"
         order.status = 'Cancelled';
         await order.save();
 
 
-        //restore stock for each item in order
+        //restore stock 
         for( const item of order.items){
             if(item.product){
                 const product = item.product
@@ -507,12 +506,12 @@ exports.cancelOrder = async (req, res) => {
             }
         }
 
-       // Handle refund if payment was online
+       // refund if payment was online
        if ((order.paymentMethod === 'Online-payment' && order.paymentStatus === 'paid') || order.paymentMethod === 'Wallet') {
         let wallet = await Wallet.findOne({ user: order.user });
 
         if (!wallet) {
-            // Create a new wallet if not found
+            // Create a new wallet 
             wallet = new Wallet({
                 user: order.user,
                 balance: 0,
@@ -839,7 +838,7 @@ exports.showWallet = async (req, res) => {
     try {
         const userId = req.session.user.id;
 
-        // Check if wallet exists, create one if not
+        // Check if wallet exists
         let wallet = await Wallet.findOne({ user: userId })
             .populate('user', 'name')
             .populate({
@@ -1040,13 +1039,13 @@ exports.addToCart = async (req, res) => {
             return res.status(401).json({ success: false, message: 'User not authenticated' });
         }
 
-        // Check if quantity is a valid number
+        
         const parsedQuantity = parseInt(quantity, 10);
         if (isNaN(parsedQuantity) || parsedQuantity < 1) {
             return res.status(400).json({ success: false, message: 'Invalid quantity' });
         }
         
-        // Check if the product exists and has enough stock
+        
         const product = await Products.findById(productId);
        
         if (!product) {
@@ -1058,13 +1057,13 @@ exports.addToCart = async (req, res) => {
         }
 
        
-        // Find or create cart for the user
+        // Find or create cart 
         let cart = await Cart.findOne({ user: userId });
         if (!cart) {
             cart = new Cart({ user: userId, items: [] ,totalPrice: 0 });
         }
 
-        // Check if the item already exists in the cart
+        // Check the item already exists 
         const existingItem = cart.items.find(item => item.product.toString() === productId);
         if (existingItem) {
             
@@ -1118,7 +1117,7 @@ exports.updateCartItem = async (req, res) => {
         }
 
         
-        // Find the item in the cart and update its quantity
+        // Find the item in cart and update quantity
         const cartItem = cart.items.find(item => item.product._id.toString() === productId);
 
         if (!cartItem) {
@@ -1127,7 +1126,7 @@ exports.updateCartItem = async (req, res) => {
 
         
 
-        // calculate the new quantity
+        // calculate new quantity
         const newQuantity = cartItem.quantity += change;
 
        
@@ -1141,7 +1140,7 @@ exports.updateCartItem = async (req, res) => {
         //update the quantity
         cartItem.quantity = newQuantity;
 
-        // Ensure the quantity is not less than 1
+        //quantity is not less than 1
         if (cartItem.quantity < 1) {
             return res.status(400).json({ success: false, message: 'Quantity cannot be less than 1' });
         }
@@ -1157,7 +1156,7 @@ exports.updateCartItem = async (req, res) => {
         // Save the updated cart
         await cart.save();
 
-        // Respond with the updated cart item details
+        
         const updatedPrice = (cartItem.quantity * cartItem.product.priceAfterDiscount).toFixed(2);
         res.json({
             success: true,
@@ -1214,7 +1213,6 @@ exports.checkStock = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
 
-        // Check if the product is deleted or its category is deleted
         if (product.isDeleted || (product.category && product.category.isDeleted)) {
             return res.status(403).json({
                 success: false,
@@ -1537,7 +1535,6 @@ exports.createOrder = async(req,res)=>{
                 console.error("Error creating Razorpay order:", err);
                 return res.status(500).json({ success: false, message: 'Error creating Razorpay order' });
             });
-            console.log(razorpayOrder)
 
             //save pending order with Razorpay order ID
             const order = new Order({

@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controller/user');
-const authMiddleware = require('../middlewares/authMiddlewares'); // Ensure this points to the correct path
+const authMiddleware = require('../middlewares/authMiddlewares');
 const passport = require('passport');
 const User = require('../models/user')
-const authenticateUser = require('../middlewares/authenticateUser')
+
 
 // Signup
 router.get('/signup', authMiddleware.preventAccessForLoggedUsers, userController.showSignup);
@@ -136,7 +136,7 @@ router.get('/cart/count',userController.getCartCount)
 router.post('/update/:productId',authMiddleware.isUserLogged,userController.updateCartItem)
 //remove item from cart
 router.post('/remove',authMiddleware.isUserLogged,userController.removeCartItem)
-//check stock status while proceed to checkout
+//check stock 
 router.get('/product-stock/:productId',authMiddleware.isUserLogged,userController.checkStock)
 
 //apply coupon

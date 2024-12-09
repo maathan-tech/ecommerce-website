@@ -369,12 +369,12 @@
             document.getElementById('mainContent').classList.toggle('sidebar-active');
         });
 
-        // Close sidebar on click outside on mobile
+        // Close sidebar
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.getElementById('sidebarToggle');
             
-            if (window.innerWidth < 992) {  // Only on mobile
+            if (window.innerWidth < 992) {  
                 if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
                     sidebar.classList.remove('active');
                     document.getElementById('mainContent').classList.remove('sidebar-active');

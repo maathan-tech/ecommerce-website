@@ -11,13 +11,13 @@ const Offers = require('./models/offer')
 
 dotenv.config();
 
-// Load Passport configuration
+// Passport configuration
 require('./config/passport');
 
 // MongoDB connect
-mongoose.connect('mongodb://localhost:27017/harvestbazar');
+mongoose.connect(process.env.MONGODB_CONNECT);
 
-// Serve static files from the 'public' directory
+
 app.use(express.static('public'));
 
 //auto deletion of offer
@@ -31,7 +31,7 @@ app.use(express.static('public'));
   }
 })();
 
-// Schedule a daily job to check for expired offers
+
 cron.schedule('0 0 * * *', async () => {
   try {
       console.log('Checking for expired offers...');
@@ -49,7 +49,7 @@ app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Session middleware (should come before passport middleware)
+// Session middleware 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your_secret_key',
   resave: false,
@@ -73,7 +73,7 @@ app.use((req, res, next) => {
 // Routes
 const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/user');
-const authMiddleware = require('./middlewares/authMiddlewares');
+
 
 app.use('/admin', adminRoutes);
 app.use('/', userRoutes);

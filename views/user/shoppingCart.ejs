@@ -347,7 +347,7 @@ async function proceedToCheckout() {
         return;
     }
 
-    // Validate stock and block status for all cart items
+    // Validate stock 
     for (const item of cartItems) {
         const productId = item.querySelector('.remove-item').getAttribute('onclick').match(/'(.*?)'/)[1];
         const cartQuantity = parseInt(item.querySelector('.quantity-input').value.trim(), 10);
@@ -408,8 +408,6 @@ async function proceedToCheckout() {
         });
         return;
     }
-
-    // If all validations pass, proceed to checkout
     window.location.href = '/checkout';
 }
 

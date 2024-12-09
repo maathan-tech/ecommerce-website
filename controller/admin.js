@@ -962,7 +962,7 @@ exports.editOffer = async(req,res)=>{
         if(!updateOffer) return res.status(404).json({ success:false, message: 'Offer not found'})
 
 
-        // Update products or categories associated with this offer
+        // Update products or categories associated offer
         if (type === 'product') {
             await Product.updateMany(
                 { offerId: offerId }, 
@@ -1130,8 +1130,8 @@ exports.getSalesReport = async (req, res) => {
 
         switch (dateRange) {
             case 'daily': {
-                const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0)); // Midnight UTC
-                const endOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999)); // End of the day UTC
+                const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0)); 
+                const endOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999)); 
                 filter.createdAt = { $gte: startOfDay, $lte: endOfDay };
                 break;
             }
@@ -1307,7 +1307,7 @@ exports.exportToExcel = async (req, res) => {
             .sort((a, b) => b.units - a.units)
             .slice(0, 5);
 
-        // Create the workbook and add the sheets
+        // Create workbook 
         const workbook = new ExcelJS.Workbook();
 
         // Overview Sheet
@@ -1343,7 +1343,7 @@ exports.exportToExcel = async (req, res) => {
             });
         });
 
-        // Set headers and send the file
+        
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         res.setHeader('Content-Disposition', 'attachment; filename="sales_report.xlsx"');
 
@@ -1431,7 +1431,7 @@ exports.exportToPDF = async (req, res) => {
         const filePath = path.join(__dirname, '../public/reports/sales_report.pdf');
 
         pdfDoc.pipe(fs.createWriteStream(filePath)); 
-        pdfDoc.pipe(res); // Stream to client
+        pdfDoc.pipe(res); 
 
         // Header
         pdfDoc.fontSize(20).text('Sales Report', { align: 'center' }).moveDown();

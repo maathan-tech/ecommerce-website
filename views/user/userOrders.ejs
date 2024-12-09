@@ -19,7 +19,7 @@
             margin: 0;
         }
 
-        /* Header Styles */
+        
         .header {
             position: fixed;
             top: 0;
@@ -34,7 +34,7 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Sidebar Styles */
+        
         .sidebar {
             width: var(--sidebar-width);
             background: white;
@@ -77,14 +77,14 @@
             left: 15px;
             z-index: 1001;
         }
-        /* Main Content */
+        
         .main-content {
             margin-left: var(--sidebar-width);
             padding: 2rem;
             transition: 0.3s all;
         }
 
-        /* Order History Table */
+       
         .order-table {
             background: white;
             border-radius: 10px;
@@ -111,26 +111,26 @@
         }
 
         .status-pending {
-            background-color: orange; /* Pending orders */
+            background-color: orange; 
         }
 
         .status-processing {
-            background-color: yellow; /* Paid orders that are being processed */
+            background-color: yellow; 
         }
 
         .status-shipped {
-            background-color: yellowgreen; /* Shipped orders */
+            background-color: yellowgreen; 
         }
 
         .status-delivered {
-            background-color: green; /* Delivered orders */
+            background-color: green; 
         }
 
         .status-cancelled {
-            background-color: red; /* Cancelled orders */
+            background-color: red; 
         }
         .status-returned {
-            background-color: rgb(255, 85, 0); /* Cancelled orders */
+            background-color: rgb(255, 85, 0);
         }
          
                 .btn-view {
@@ -174,7 +174,7 @@
             z-index: 999;
         }
 
-        /* Responsive Styles */
+       
         @media (max-width: 991px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -209,7 +209,7 @@
                 display: block;
             }
 
-            /* Responsive table */
+            
             .order-table {
                 display: block;
                 overflow-x: auto;
@@ -375,7 +375,7 @@
         sidebarToggle.addEventListener('click', toggleSidebar);
         overlay.addEventListener('click', toggleSidebar);
 
-        // Close sidebar on window resize if screen becomes large
+        // Close sidebar
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 992) {
                 sidebar.classList.remove('show');
