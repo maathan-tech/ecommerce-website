@@ -271,18 +271,34 @@ exports.updateReturnStatus = async(req,res)=>{
 //Show usermanagement
 exports.getUser = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1; 
-        const limit = parseInt(req.query.limit) || 5;
-        const skip = (page - 1) * limit; 
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.max(1, parseInt(req.query.limit) || 20);
+        const skip = (page - 1) * limit;
 
-        const users = await User.find().skip(skip).limit(limit).sort({ createdAt: -1}); 
-        const totalUsers = await User.countDocuments(); 
-        const totalPages = Math.ceil(totalUsers / limit); 
+        const totalUsers = await User.countDocuments();
+        const totalPages = Math.ceil(totalUsers / limit);
 
-        res.render('admin/usermanagement', { users, currentPage: page, totalPages });
+        if (page > totalPages && totalPages > 0) {
+            return res.redirect(`?page=${totalPages}&limit=${limit}`);
+        }
+
+        const users = await User.find()
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 });
+
+        res.render('admin/usermanagement', {
+            users,
+            currentPage: page,
+            totalPages,
+            limit,
+        });
     } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ success:false, message:'Error occur while userdetails display'})
+        console.error(error.message);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred while displaying user details',
+        });
     }
 };
 
