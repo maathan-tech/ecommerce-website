@@ -27,8 +27,8 @@ router.get('/usermanagement',authMiddleware.isAdminLogged,adminController.getUse
 //search user
 router.get('/usermanagement/search',authMiddleware.isAdminLogged,adminController.searchUsers)
 //block or unblock user
-router.post('/usermanagement/block/:id',adminController.blockUser)
-router.post('/usermanagement/unblock/:id',adminController.unblockUser)
+router.post('/usermanagement/block/:id',authMiddleware.isAdminLogged,adminController.blockUser)
+router.post('/usermanagement/unblock/:id',authMiddleware.isAdminLogged,adminController.unblockUser)
 
 //list categories
 router.get('/productcategories',authMiddleware.isAdminLogged,adminController.listProductCategories)
