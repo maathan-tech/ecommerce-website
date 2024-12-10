@@ -38,8 +38,6 @@ offerSchema.statics.deactivateExpiredOffers = async function () {
         
         const expiredOffers = await this.find({ endDate: { $lt: now }, isActive: true });
 
-        console.log('expired offer:',expiredOffers)
-        
         for (const offer of expiredOffers) {
             await offer.deactivateOffer();
         }
@@ -52,7 +50,6 @@ offerSchema.statics.deactivateExpiredOffers = async function () {
 
 offerSchema.methods.deactivateOffer = async function () {
     if (!this.isActive) return;
-    console.log(`Deactivating offer: ${this.title}`)
 
     this.isActive = false;
 console.log(this._id)

@@ -421,35 +421,41 @@ exports.showUserdashboard = async(req,res)=>{
 }
 
 //show orders
-exports.showOrderdetails = async(req,res)=>{
-
-    const page = parseInt(req.query.page) || 1; 
+exports.showOrderdetails = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;  
     const limit = 10; 
     const skip = (page - 1) * limit; 
 
     try {
-        
-        const orders = await Order.find({ user: req.session.user.id }).populate('items.product').skip(skip).limit(limit).sort({ createdAt: -1 })
-        const ordersWithDetails = orders.map(order => {
-        const totalQuantity = order.items.reduce((total, item) => total + item.quantity, 0);
-        const totalAmount = order.totalPriceAfterDiscount
+        const orders = await Order.find({ user: req.session.user.id })
+            .populate('items.product')
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 }); 
+
       
-            
+        const ordersWithDetails = orders.map(order => {
+            const totalQuantity = order.items.reduce((total, item) => total + item.quantity, 0);
+            const totalAmount = order.totalPriceAfterDiscount; 
             return { 
-              ...order.toObject(), 
-              totalQuantity, 
-              totalAmount 
+                ...order.toObject(),  
+                totalQuantity, 
+                totalAmount 
             };
-          });
+        });
 
-        const totalOrders = await Order.countDocuments({});
-        const totalPages = Math.ceil(totalOrders / limit);
+       
+        const totalOrders = await Order.countDocuments({ user: req.session.user.id });
+        const totalPages = Math.ceil(totalOrders / limit); 
 
-        res.render('user/userOrders',{ orders:ordersWithDetails, currentPage: page, totalPages: totalPages })
+        res.render('user/userOrders', {
+            orders: ordersWithDetails, 
+            currentPage: page, 
+            totalPages: totalPages 
+        });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ success: false, message:'Error in fetching orders'})
-        
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Error in fetching orders' });
     }
 }
 
@@ -803,7 +809,7 @@ exports.uploadProfileImage = (req, res) => {
 exports.updateProfile = async(req,res)=>{
     try {
         const trimmedData = { firstName: req.body.firstName?.trim(), lastName: req.body.lastName?.trim(), mobile: req.body.mobile }
-        await User.findByIdAndUpdate(req.session.user.id, { trimmedData })
+        await User.findByIdAndUpdate(req.session.user.id, trimmedData, { new : true })
         res.status(200).json({ success:true, message:'Profile updated successfully'})
 
     } catch (error) {
@@ -1415,8 +1421,6 @@ exports.createOrder = async(req,res)=>{
 
         let { shippingAddress, paymentMethod, couponCode } = req.body
         const userId = req.session.user.id
-
-        console.log(couponCode, paymentMethod,shippingAddress )
 
         if(!userId){
             return res.status(401).json({ success: false, message: 'User not authenticated'})

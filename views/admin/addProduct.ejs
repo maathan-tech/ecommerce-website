@@ -160,7 +160,7 @@
 
         const result = await response.json();
 
-        if (response.ok) {
+        if (result.success) {
             Swal.fire({
                 title: 'Success',
                 text: 'Product added successfully!',

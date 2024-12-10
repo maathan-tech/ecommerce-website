@@ -171,17 +171,17 @@
         }
 
        
-        if (trimmedAddress.firstName && !/^[a-zA-Z\s]+$/.test(trimmedAddress.firstName)) {
-            errors.push('First name should only contain letters');
+        if (trimmedAddress.firstName.length < 3 && !/^[a-zA-Z\s]+$/.test(trimmedAddress.firstName)) {
+            errors.push('First name should only contain letters and 3 characters required');
         }
-        if (trimmedAddress.lastName && !/^[a-zA-Z\s]+$/.test(trimmedAddress.lastName)) {
-            errors.push('Last name should only contain letters');
+        if (trimmedAddress.lastName.length < 1 && !/^[a-zA-Z\s]+$/.test(trimmedAddress.lastName)) {
+            errors.push('Last name should only contain letters and 1 character required');
         }
-        if(trimmedAddress.state && !/^[a-zA-Z\s]+$/.test(trimmedAddress.state)){
-            errors.push('State name contains only letters')
+        if(trimmedAddress.state.length < 3 && !/^[a-zA-Z\s]+$/.test(trimmedAddress.state)){
+            errors.push('State name contains only letters and 3 characters required')
         }
-        if(trimmedAddress.country && !/^[a-zA-Z\s]+$/.test(trimmedAddress.country)){
-            errors.push('Country name should contains only letters')
+        if(trimmedAddress.country.length < 3 && !/^[a-zA-Z\s]+$/.test(trimmedAddress.country)){
+            errors.push('Country name should contains only letters and 3 characters required')
         }
 
         return { errors, trimmedAddress };

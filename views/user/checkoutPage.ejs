@@ -611,7 +611,7 @@ document.getElementById('saveAddressBtn').addEventListener('click', function(eve
     var country = document.getElementById('country').value.trim();
 
    
-    var mobileRegex = /^[0-9]{10}$/;
+    var mobileRegex = /^[6-9]\d{9}$/;
     var zipcodeRegex = /^[0-9]{6}$/;
 
   
@@ -624,34 +624,34 @@ document.getElementById('saveAddressBtn').addEventListener('click', function(eve
     }
 
     // Validate fields with minimum length of 3
-    if (firstName.length < 3) {
+    if (firstName.length < 3 || !/^[a-zA-Z\s]+$/.test(firstName)) {
         showErrorAlert('First Name must be at least 3 characters long.');
         return;
     }
-    if (lastName.length < 1) {
+    if (lastName.length < 1 || !/^[a-zA-Z\s]+$/.test(lastName)) {
         showErrorAlert('Last Name must be at least 1 characters long.');
         return;
     }
-    if (street.length < 3) {
+    if (street.length < 3 ) {
         showErrorAlert('Street Address must be at least 3 characters long.');
         return;
     }
-    if (city.length < 3) {
+    if (city.length < 3 || !/^[a-zA-Z\s]+$/.test(city)) {
         showErrorAlert('City must be at least 3 characters long.');
         return;
     }
-    if (state.length < 3) {
+    if (state.length < 3 || !/^[a-zA-Z\s]+$/.test(state)) {
         showErrorAlert('State must be at least 3 characters long.');
         return;
     }
-    if (country.length < 3) {
+    if (country.length < 3 || !/^[a-zA-Z\s]+$/.test(country)) {
         showErrorAlert('Country must be at least 3 characters long.');
         return;
     }
 
     // Validate mobile number (10 digits)
     if (!mobileRegex.test(mobile)) {
-        showErrorAlert('Mobile number must be exactly 10 digits.');
+        showErrorAlert('Mobile number must be exactly 10 digits and starts inbetween 6-9.');
         return;
     }
 

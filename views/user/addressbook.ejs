@@ -472,16 +472,16 @@
         }
 
        
-        if (trimmedAddress.firstName && !/^[a-zA-Z\s]+$/.test(trimmedAddress.firstName)) {
+        if (trimmedAddress.firstName.length < 3 && !/^[a-zA-Z\s]+$/.test(trimmedAddress.firstName)) {
             errors.push('First name should only contain letters');
         }
-        if (trimmedAddress.lastName && !/^[a-zA-Z\s]+$/.test(trimmedAddress.lastName)) {
+        if (trimmedAddress.lastName.lastName < 1 && !/^[a-zA-Z\s]+$/.test(trimmedAddress.lastName)) {
             errors.push('Last name should only contain letters');
         }
-        if(trimmedAddress.state && !/^[a-zA-Z\s]+$/.test(trimmedAddress.state)){
+        if(trimmedAddress.state.length < 3 && !/^[a-zA-Z\s]+$/.test(trimmedAddress.state)){
             errors.push('State name contains only letters')
         }
-        if(trimmedAddress.country && !/^[a-zA-Z\s]+$/.test(trimmedAddress.country)){
+        if(trimmedAddress.country.length < 3 && !/^[a-zA-Z\s]+$/.test(trimmedAddress.country)){
             errors.push('Country name should contains only letters')
         }
 

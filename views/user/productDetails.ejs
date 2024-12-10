@@ -261,6 +261,7 @@
                 <div class="mb-3">
                     <span class="price-tag" id="priceTag">₹ <%= product.priceAfterDiscount.toFixed(2) %></span>
                     <span class="old-price ms-2">₹<%= product.price %>/kg</span>
+                    <small class="text-muted fw-bold"><br>₹<%= product.priceAfterDiscount.toFixed(2) %> per KG</small>
                 </div>
                 <% if(product.stock < 10){ %>
                     <p class="text-danger fw-bold"> <%= product.stock %>kg left </p>
@@ -269,7 +270,7 @@
                 <div class="d-flex align-items-center mb-4">
                     <div class="input-group" style="width: 130px;">
                         <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(-1)">-</button>
-                        <input type="number" id="quantityInput" class="form-control text-center" value="1" min="1" max="<%= product.stock %>" onchange="updatePrice()">
+                        <input type="number" id="quantityInput" class="form-control text-center" value="1" min="1" max="<%= product.stock %>" onchange="updatePrice()" readonly>
                         <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(1)">+</button>
                     </div>
                     
@@ -301,7 +302,7 @@
                             <i class="fas fa-percentage text-success"></i>
                         </div>
                         <h6><%=product.offerDiscount %>% Discount</h6>
-                        <small class="text-muted">Save up to ₹<%= product.discountAmount %> money/kg</small>
+                        <small class="text-muted">Save up to ₹<%= product.discountAmount %>/kg</small>
                     </div>
                     <div class="col-6 col-md-3 text-center">
                         <div class="feature-icon mx-auto">
@@ -515,7 +516,7 @@
 function updatePrice() {
     const quantity = parseInt(document.getElementById('quantityInput').value);
     const totalPrice = quantity * productPrice;
-    document.getElementById('priceTag').textContent = `₹${totalPrice.toFixed(2)}/kg`;
+    document.getElementById('priceTag').textContent = `₹${totalPrice.toFixed(2)}`;
 }
 
 // Add to Cart functionality
